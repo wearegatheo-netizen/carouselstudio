@@ -8,7 +8,8 @@
 | `index.html` | 빌드된 앱(꾸불림 폰트·기본 사진·html2canvas 내장, 약 2.7MB) |
 | `config.js` | Supabase URL / anon 키 / 테이블명. 클라우드 저장·열기 기능에 사용 |
 | `supabase/migrations/20260922_carousel_projects.sql` | `carousel_projects` 테이블 + RLS |
-| `_headers` | Cloudflare Pages 응답 헤더 |
+| `_headers` | Cloudflare 응답 헤더 (dist/에 복사됨) |
+| `wrangler.jsonc` | Cloudflare Workers 정적 에셋 설정 (`dist/`) |
 | `src/` | 템플릿(`studio.tpl.html`)·레이아웃 JSON·에셋·빌드 스크립트 |
 | `.github/workflows/deploy-pages.yml` | (선택) wrangler로 Pages 배포 |
 
@@ -26,7 +27,7 @@
 ## Cloudflare Pages 연결
 **방법 A — 대시보드에서 GitHub 연결(권장)**
 1. Cloudflare 대시보드 → Workers & Pages → Create → Pages → *Connect to Git* → `wearegatheo-netizen/carouselstudio` 선택.
-2. Production branch `master`, Framework preset **None**, Build command **(비움)**, Build output directory **`/`** (저장소 루트).
+2. Production branch `master`, Build command **`npm run build`**, Deploy command **`npx wrangler deploy`** (Workers 방식, `wrangler.jsonc`가 `dist/`만 에셋으로 배포). Pages 방식이면 Build output directory를 **`dist`**로 지정.
 3. 배포 후 `https://carouselstudio.pages.dev` 로 접속. 필요하면 *Custom domains*에서 `studio.gatherallaround.com` 같은 서브도메인을 연결(DNS는 Cloudflare가 자동 추가).
 
 **방법 B — GitHub Actions(wrangler)**
@@ -35,6 +36,6 @@
 ## 개발
 ```bash
 npm install          # html2canvas (빌드 시 인라인용)
-npm run build        # src/studio.tpl.html + template.json + assets.json → index.html
+npm run build        # src/… → index.html, 그리고 index.html·config.js·_headers → dist/
 ```
 `src/template.json`은 기본 7장 슬라이드의 레이어 좌표·스타일, `src/assets.json`은 기본 사진(JPEG dataURL)과 꾸불림 woff2입니다.

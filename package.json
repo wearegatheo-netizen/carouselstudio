@@ -3,6 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "description": "Gather All Around 인스타그램 캐러셀 스튜디오 (정적 단일 HTML)",
-  "scripts": { "build": "cd src && node build.mjs" },
-  "devDependencies": { "html2canvas": "1.4.1" }
+  "scripts": {
+    "build": "cd src && node build.mjs && cd .. && mkdir -p dist && cp index.html config.js _headers dist/",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
+  },
+  "devDependencies": {
+    "html2canvas": "1.4.1"
+  }
 }
