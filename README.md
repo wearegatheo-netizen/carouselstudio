@@ -8,15 +8,19 @@
 | `index.html` | 빌드된 앱(꾸불림 폰트·기본 사진·html2canvas 내장, 약 2.7MB) |
 | `config.js` | Supabase URL / anon 키 / 테이블명. 클라우드 저장·열기 기능에 사용 |
 | `supabase/migrations/20260922_carousel_projects.sql` | `carousel_projects` 테이블 + RLS |
+| `supabase/migrations/20260922_carousel_projects_v2.sql` | 썸네일·장 수 컬럼, 삭제 정책 (프로젝트 목록용, **추가 실행 필요**) |
 | `_headers` | Cloudflare 응답 헤더 (dist/에 복사됨) |
 | `wrangler.jsonc` | Cloudflare Workers 정적 에셋 설정 (`dist/`) |
 | `src/` | 템플릿(`studio.tpl.html`)·레이아웃 JSON·기본 사진(`assets.json`)·꾸불림 4개 서브셋+unicode-range(`fonts.json`)·빌드 스크립트 |
 | `.github/workflows/deploy-pages.yml` | (선택) wrangler로 Pages 배포 |
 
+## 프로젝트
+앱을 열면 프로젝트 목록이 뜹니다. 템플릿/빈 프로젝트로 새로 만들기, 열기, 복사, 이름 변경, 삭제가 되고, 편집 중 8초 뒤 자동 저장(💾 저장 또는 Ctrl+S로 즉시 저장)됩니다. 주소의 `?p=코드`로 특정 프로젝트가 바로 열립니다. Supabase가 설정돼 있으면 클라우드(`carousel_projects`)에, 없으면 이 브라우저(localStorage)에만 저장됩니다.
+
 ## 저장 방식
-- **브라우저 자동 저장**: 편집 즉시 `localStorage`에 저장(사진이 많으면 5MB 한도 초과 가능 → 상단 안내 표시).
+- **브라우저 저장(Supabase 미설정 시)**: `localStorage`에 프로젝트 저장. 사진이 많으면 5MB 한도 초과 가능.
 - **작업 파일(.json)**: 내려받아 보관/이동.
-- **클라우드(Supabase)**: [☁ 클라우드 저장] → 8자리 코드 발급, 주소가 `?p=코드`로 바뀌어 링크만 열면 이어서 편집. [☁ 클라우드 열기]에 코드를 입력해도 됩니다. 코드가 곧 접근 열쇠이므로 외부에 공유하지 마세요.
+- **클라우드(Supabase)**: 프로젝트 단위로 저장·목록. 링크(`?p=코드`)만 있으면 누구나 열 수 있으니 외부에 공유하지 마세요.
 
 ## Supabase 연결
 1. Supabase 대시보드 → SQL Editor에서 `supabase/migrations/20260922_carousel_projects.sql` 실행

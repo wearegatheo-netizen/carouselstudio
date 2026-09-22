@@ -69,21 +69,30 @@ kbd{background:var(--ui3);border-radius:4px;padding:1px 5px;font-size:11px}
 .lyr .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lyr .t{color:var(--muted);font-size:11px;width:28px}
 .lyr button{padding:1px 5px;font-size:11px;background:none;border-color:transparent}.lyr button.off{opacity:.35}
 .fmt{display:flex;gap:3px}.fmt button{flex:1;padding:6px 2px;font-weight:700}
+ [hidden]{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:20;display:grid;place-items:center;padding:20px}
+.dlg{background:var(--ui);border:1px solid var(--line);border-radius:16px;width:min(980px,100%);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.dh{display:flex;gap:8px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}.dh h2{font-family:KkuBulLim;font-weight:400;font-size:22px;color:var(--amber2)}
+.plist{overflow:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.pc{background:var(--ui2);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer}
+.pc:hover{border-color:var(--amber)}.pc.cur{outline:2px solid var(--amber)}
+.pc .th{aspect-ratio:4/5;background:#000 center/cover no-repeat;display:grid;place-items:center;color:var(--muted);font-size:12px}
+.pc .pb{padding:8px 10px;display:flex;flex-direction:column;gap:4px}.pc .pt{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pc .pm{font-size:11px;color:var(--muted)}
+.pc .pa{display:flex;gap:4px;margin-top:4px}.pc .pa button{flex:1;padding:4px 2px;font-size:11px}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--amber);color:#1a1408;padding:9px 16px;border-radius:999px;font-weight:700;opacity:0;transition:.25s;pointer-events:none;z-index:9}
 #toast.show{opacity:1}
 @media (max-width:900px){main{grid-template-columns:1fr}aside{display:none}}
 </style></head><body>
 <header>
- <h1>Gather All Around · 캐러셀 스튜디오</h1>
+ <h1>캐러셀 스튜디오</h1>
  <button id="bUndo" class="ic" title="Ctrl+Z">↶</button><button id="bRedo" class="ic" title="Ctrl+Y">↷</button>
  <span class="sep"></span>
  <select id="selSize" style="width:auto" title="캔버스 크기"><option value="1080x1350">4:5 피드 1080×1350</option><option value="1080x1080">1:1 정사각 1080×1080</option><option value="1080x1920">9:16 스토리 1080×1920</option></select>
  <select id="selFmt" style="width:auto" title="저장 형식"><option value="png">PNG</option><option value="jpg">JPG</option></select>
  <button id="bPng">이 장 저장</button><button id="bPngAll" class="primary">전체 저장</button>
  <span class="sep"></span>
- <button id="bExport">작업 파일(.json)</button><button id="bImport">열기</button><input type="file" id="fImport" accept="application/json" hidden>
- <button id="bCloudSave" title="Supabase에 저장">☁ 클라우드 저장</button><button id="bCloudOpen">☁ 열기</button><span id="cloudCode" style="font-size:12px;color:var(--muted)"></span>
- <button id="bReset" class="danger">초기화</button>
+ <button id="bHome">📁 프로젝트</button><button id="pTitle" title="클릭해서 이름 변경" style="max-width:220px;overflow:hidden;text-overflow:ellipsis">제목 없음</button><button id="bSave" title="Ctrl+S">💾 저장</button><span id="saveStat" style="font-size:12px;color:var(--muted);min-width:60px"></span>
+ <button id="bExport" class="ic" title="작업 파일(.json) 내려받기">⤓ json</button><button id="bImport" class="ic" title="작업 파일(.json) 불러오기">⤒ json</button><input type="file" id="fImport" accept="application/json" hidden>
  <div class="msg">요소 <b>클릭 → 드래그</b> 이동(가운데·여백선에 자동 스냅), <b>더블클릭</b> 문구 수정, 손잡이로 폭·회전. <kbd>Del</kbd> 삭제 · <kbd>←↑↓→</kbd> 이동(<kbd>Shift</kbd> 10px) · <kbd>Ctrl+C/V</kbd> 복사·붙여넣기(다른 장에도) · <kbd>Ctrl+D</kbd> 복제 · <kbd>Ctrl+Z</kbd> 되돌리기 · <kbd>Esc</kbd> 선택 해제</div>
 </header>
 <main>
@@ -92,6 +101,10 @@ kbd{background:var(--ui3);border-radius:4px;padding:1px 5px;font-size:11px}
  <aside class="right" id="right"></aside>
 </main>
 <div id="toast"></div>
+<div id="home" class="modal" hidden><div class="dlg">
+ <div class="dh"><h2>프로젝트</h2><span id="homeStat" class="empty"></span><span style="flex:1"></span><button id="hNewT" class="primary">＋ 템플릿으로 새 프로젝트</button><button id="hNewB">＋ 빈 프로젝트</button><button id="hClose" class="ic" title="닫기">✕</button></div>
+ <div id="plist" class="plist"></div>
+</div></div>
 <input type="file" id="fPhoto" accept="image/*" hidden><input type="file" id="fImg" accept="image/*" hidden><input type="file" id="fFont" accept=".ttf,.otf,.woff,.woff2" hidden>
 <script>
 const ASSETS={{ASSETS}};
@@ -105,10 +118,9 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const uid=()=>'L'+Math.random().toString(36).slice(2,8);
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);}
 function fresh(){return {size:{w:1080,h:1350},slides:clone(TEMPLATE).map(s=>({...s,layers:s.layers.map(l=>({...l,radius:(l.type==='text'&&l.bgA===0&&l.borderW===0)?0:l.radius}))})),fonts:[]};}
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.slides&&s.slides.length){state=s;state.size=state.size||{w:1080,h:1350};state.fonts=state.fonts||[];return;}}catch(e){}state=fresh();}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){$('header .msg').textContent='⚠ 사진 용량이 커서 브라우저 자동 저장이 되지 않습니다. [작업 파일] 또는 [☁ 클라우드 저장]으로 보관해 주세요.';}}
+function save(){}
 function snap(){return JSON.stringify({slides:state.slides,size:state.size});}
-function commit(){hist=hist.slice(0,hptr+1);hist.push(snap());if(hist.length>100)hist.shift();hptr=hist.length-1;save();}
+let commit=function(){hist=hist.slice(0,hptr+1);hist.push(snap());if(hist.length>100)hist.shift();hptr=hist.length-1;save();}
 function restore(j){const o=JSON.parse(j);state.slides=o.slides;state.size=o.size;cur=Math.min(cur,state.slides.length-1);selId=null;editingId=null;save();renderAll();}
 function undo(){if(hptr<=0)return;hptr--;restore(hist[hptr]);}
 function redo(){if(hptr>=hist.length-1)return;hptr++;restore(hist[hptr]);}
@@ -329,10 +341,9 @@ function renderRight(){
 $('#fPhoto').onchange=e=>{const f=e.target.files[0];if(!f)return;readImage(f,1600,d=>{slide().photo=d;commit();renderAll();toast('배경 사진 교체됨');});e.target.value='';};
 $('#fImg').onchange=e=>{const f=e.target.files[0];if(!f)return;readImage(f,1400,(d,w,h)=>{const l=sel();if(l&&l.type==='image'){l.src=d;}else{const mw=Math.min(w,W()-160);const nl={id:uid(),type:'image',x:80,y:300,w:mw,h:Math.round(h*mw/w),src:d,fit:'cover',radius:0,border:'#F5EFE4',borderA:100,borderW:0,rot:0,opacity:100};slide().layers.push(nl);selId=nl.id;}commit();renderAll();toast('이미지 추가됨');});e.target.value='';};
 $('#fFont').onchange=e=>{const f=e.target.files[0];if(!f)return;const name=f.name.replace(/\.[^.]+$/,'');const rd=new FileReader();rd.onload=async()=>{try{const ff=new FontFace(name,`url(${rd.result})`);await ff.load();document.fonts.add(ff);state.fonts=state.fonts.filter(x=>x.name!==name);state.fonts.push({name,data:rd.result});if(sel()&&sel().type==='text'){sel().font='custom:'+name;}commit();renderAll();toast(`글꼴 "${name}" 추가됨`);}catch(err){alert('글꼴을 불러오지 못했습니다: '+err.message);}};rd.readAsDataURL(f);e.target.value='';};
-$('#bExport').onclick=()=>{const a=document.createElement('a');a.download=`gaa-carousel-${new Date().toISOString().slice(0,10)}.json`;a.href=URL.createObjectURL(new Blob([JSON.stringify(state)],{type:'application/json'}));a.click();};
+$('#bExport').onclick=()=>{const a=document.createElement('a');a.download=`${proj.title||'carousel'}.json`;a.href=URL.createObjectURL(new Blob([JSON.stringify(state)],{type:'application/json'}));a.click();};
 $('#bImport').onclick=()=>$('#fImport').click();
-$('#fImport').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const s=JSON.parse(rd.result);if(!s.slides)throw 0;state=s;state.size=state.size||{w:1080,h:1350};state.fonts=state.fonts||[];registerFonts();cur=0;selId=null;commit();renderAll();toast('작업 파일을 열었어요');}catch(err){alert('작업 파일 형식이 아닙니다.');}};rd.readAsText(f);e.target.value='';};
-$('#bReset').onclick=()=>{if(!confirm('모든 수정 내용을 지우고 처음 템플릿으로 되돌릴까요?'))return;state=fresh();cur=0;selId=null;commit();renderAll();};
+$('#fImport').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const s=JSON.parse(rd.result);if(!s.slides)throw 0;const t=prompt('불러온 작업의 프로젝트 이름',f.name.replace(/\.json$/,''))||'가져온 프로젝트';useProject(null,t,s);dirty=true;saveProject(true);toast('작업 파일을 새 프로젝트로 가져왔어요');}catch(err){alert('작업 파일 형식이 아닙니다.');}};rd.readAsText(f);e.target.value='';};
 $('#bUndo').onclick=undo;$('#bRedo').onclick=redo;
 $('#selSize').onchange=e=>{const [w,h]=e.target.value.split('x').map(Number);const oh=H();state.size={w,h};
   state.slides.forEach(s=>s.layers.forEach(l=>{if(l.y>oh*0.5)l.y=Math.round(l.y+(h-oh));}));zoom=null;commit();renderAll();toast(`캔버스 ${w}×${h} — 아래쪽 요소는 새 하단에 맞춰 이동했어요`);};
@@ -345,31 +356,66 @@ async function renderPNG(i){
   host.remove();return canvas;
 }
 function saveCanvas(c,name){const jpg=$('#selFmt').value==='jpg';const a=document.createElement('a');a.download=name+(jpg?'.jpg':'.png');a.href=jpg?c.toDataURL('image/jpeg',.92):c.toDataURL('image/png');a.click();}
-const fname=i=>`gaa-carousel-${String(i+1).padStart(2,'0')}`;
+const fname=i=>`${(proj.title||'carousel').replace(/[\\/:*?"<>|]/g,'_')}-${String(i+1).padStart(2,'0')}`;
 $('#bPng').onclick=async e=>{const b=e.target;b.disabled=true;try{saveCanvas(await renderPNG(cur),fname(cur));toast('저장됨');}catch(err){alert('이미지를 만들지 못했습니다: '+err.message);}b.disabled=false;};
 $('#bPngAll').onclick=async e=>{const b=e.target;b.disabled=true;const t=b.textContent;try{for(let i=0;i<state.slides.length;i++){b.textContent=`${i+1}/${state.slides.length}…`;saveCanvas(await renderPNG(i),fname(i));await new Promise(r=>setTimeout(r,700));}toast(`${state.slides.length}장 저장됨`);}catch(err){alert('이미지를 만들지 못했습니다: '+err.message);}b.disabled=false;b.textContent=t;};
-/* ---------- cloud (Supabase) ---------- */
+/* ---------- projects (Supabase 또는 브라우저 저장소) ---------- */
 const CFG=window.CAROUSEL_CONFIG||{};let sb=null;
 try{if(CFG.supabaseUrl&&CFG.supabaseAnonKey&&window.supabase)sb=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey);}catch(e){console.error(e);}
-const TABLE=CFG.table||'carousel_projects';
-let cloudCode=null;try{cloudCode=new URL(location.href).searchParams.get('p')||localStorage.getItem(KEY+':code');}catch(e){}
-function showCode(){$('#cloudCode').textContent=cloudCode?`코드 ${cloudCode}`:'';if(!sb){$('#bCloudSave').disabled=$('#bCloudOpen').disabled=true;$('#bCloudSave').title='config.js에 Supabase 설정이 없거나 supabase-js를 불러오지 못했습니다';}}
+const TABLE=CFG.table||'carousel_projects', LKEY='gaa-projects';
 const newCode=()=>Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b%32]).join('');
-async function cloudSave(){if(!sb)return;const b=$('#bCloudSave');b.disabled=true;try{
-  if(!cloudCode)cloudCode=newCode();
-  const title=(state.slides[0].layers.find(l=>l.type==='text'&&l.size>=60)||{}).html?.replace(/<[^>]+>/g,' ').trim().slice(0,60)||'캐러셀';
-  const {error}=await sb.from(TABLE).upsert({code:cloudCode,title,data:state,updated_at:new Date().toISOString()},{onConflict:'code'});
-  if(error)throw error;try{localStorage.setItem(KEY+':code',cloudCode);}catch(e){}history.replaceState(null,'',`?p=${cloudCode}`);showCode();
-  toast(`클라우드에 저장됨 · 코드 ${cloudCode}`);}catch(err){console.error(err);alert('클라우드 저장 실패: '+(err.message||err));}b.disabled=false;}
-async function cloudOpen(code,silent){if(!sb)return false;try{const {data,error}=await sb.from(TABLE).select('data').eq('code',code).maybeSingle();if(error)throw error;
-  if(!data){if(!silent)alert('해당 코드의 작업을 찾을 수 없습니다.');return false;}
-  state=data.data;state.size=state.size||{w:1080,h:1350};state.fonts=state.fonts||[];registerFonts();cloudCode=code;try{localStorage.setItem(KEY+':code',code);}catch(e){}history.replaceState(null,'',`?p=${code}`);cur=0;selId=null;commit();renderAll();showCode();toast('클라우드에서 불러왔어요');return true;}
-  catch(err){console.error(err);if(!silent)alert('불러오기 실패: '+(err.message||err));return false;}}
-$('#bCloudSave').onclick=cloudSave;
-$('#bCloudOpen').onclick=async()=>{const c=prompt('작업 코드를 입력하세요 (예: ABCD2345)',cloudCode||'');if(!c)return;await cloudOpen(c.trim().toUpperCase());};
+const lget=()=>{try{return JSON.parse(localStorage.getItem(LKEY)||'{}');}catch(e){return {};}};
+const lset=o=>{try{localStorage.setItem(LKEY,JSON.stringify(o));return true;}catch(e){return false;}};
+const store={
+  async list(){if(sb){const {data,error}=await sb.from(TABLE).select('code,title,thumb,slide_count,updated_at').order('updated_at',{ascending:false});if(error)throw error;return data;}
+    return Object.values(lget()).map(({data,...m})=>m).sort((a,b)=>b.updated_at.localeCompare(a.updated_at));},
+  async get(code){if(sb){const {data,error}=await sb.from(TABLE).select('*').eq('code',code).maybeSingle();if(error)throw error;return data;}return lget()[code]||null;},
+  async put(row){if(sb){const {error}=await sb.from(TABLE).upsert(row,{onConflict:'code'});if(error)throw error;return;}const o=lget();o[row.code]={...(o[row.code]||{}),...row};if(!lset(o))throw new Error('브라우저 저장 공간이 부족합니다. Supabase 연결을 설정하거나 사진 수를 줄여 주세요.');},
+  async del(code){if(sb){const {error}=await sb.from(TABLE).delete().eq('code',code);if(error)throw error;return;}const o=lget();delete o[code];lset(o);}
+};
+let proj={code:null,title:'제목 없음'}, dirty=false, saving=false, autoT=null;
+function setStat(t){$('#saveStat').textContent=t;}
+function markDirty(){dirty=true;setStat('수정됨');clearTimeout(autoT);autoT=setTimeout(()=>{if(dirty&&proj.code&&!editingId)saveProject(true);},8000);}
+async function thumbOf(){try{const c=await renderPNG(0);const t=document.createElement('canvas');t.width=216;t.height=Math.round(216*H()/W());t.getContext('2d').drawImage(c,0,0,t.width,t.height);return t.toDataURL('image/jpeg',.7);}catch(e){return null;}}
+async function saveProject(auto){if(saving)return;saving=true;setStat('저장 중…');try{
+  if(!proj.code)proj.code=newCode();
+  const row={code:proj.code,title:proj.title,data:state,slide_count:state.slides.length,thumb:await thumbOf(),updated_at:new Date().toISOString()};
+  await store.put(row);dirty=false;setStat('저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));
+  try{localStorage.setItem(KEY+':code',proj.code);}catch(e){}history.replaceState(null,'',`?p=${proj.code}`);if(!auto)toast('프로젝트 저장됨');}
+  catch(err){console.error(err);setStat('저장 실패');if(!auto)alert('저장 실패: '+(err.message||err));}saving=false;}
+function useProject(code,title,data){proj={code,title};state=data;state.size=state.size||{w:1080,h:1350};state.fonts=state.fonts||[];registerFonts();cur=0;selId=null;editingId=null;hist=[snap()];hptr=0;dirty=false;
+  $('#pTitle').textContent=title;setStat(code?'':'미저장');if(code){history.replaceState(null,'',`?p=${code}`);try{localStorage.setItem(KEY+':code',code);}catch(e){}}renderAll();}
+async function openProject(code){try{const r=await store.get(code);if(!r){alert('프로젝트를 찾을 수 없습니다.');return false;}useProject(r.code,r.title,r.data);closeHome();toast(`"${r.title}" 열림`);return true;}catch(err){alert('불러오기 실패: '+(err.message||err));return false;}}
+async function newProject(fromTemplate){if(dirty&&!confirm('저장하지 않은 변경이 있습니다. 새 프로젝트를 만들까요?'))return;
+  const title=prompt('프로젝트 이름',fromTemplate?'게더 올 어라운드 팀 모집':'새 캐러셀');if(title===null)return;
+  const data=fromTemplate?fresh():{size:{w:1080,h:1350},fonts:[],slides:[{id:'S'+uid(),photo:'',px:50,py:50,zoom:100,sh:55,shA:92,bg:'#14110E',pager:true,layers:[]}]};
+  useProject(null,title.trim()||'제목 없음',data);closeHome();await saveProject(true);toast('새 프로젝트 생성');}
+async function copyProject(code,title){try{const r=await store.get(code);if(!r)return;const c=newCode();const t=prompt('복사본 이름',title+' (복사본)');if(t===null)return;
+  await store.put({code:c,title:t.trim()||title,data:r.data,slide_count:r.slide_count,thumb:r.thumb,updated_at:new Date().toISOString()});toast('복사됨');renderHome();}catch(err){alert('복사 실패: '+(err.message||err));}}
+async function renameProject(code,title){const t=prompt('새 이름',title);if(t===null||!t.trim())return;try{if(code===proj.code){proj.title=t.trim();$('#pTitle').textContent=proj.title;}
+  const r=await store.get(code);if(r){await store.put({...r,title:t.trim(),updated_at:new Date().toISOString()});}renderHome();}catch(err){alert('이름 변경 실패: '+(err.message||err));}}
+async function deleteProject(code,title){if(!confirm(`"${title}" 프로젝트를 삭제할까요? 되돌릴 수 없습니다.`))return;try{await store.del(code);if(code===proj.code){proj.code=null;setStat('미저장');history.replaceState(null,'','?');}toast('삭제됨');renderHome();}catch(err){alert('삭제 실패: '+(err.message||err));}}
+async function renderHome(){const P=$('#plist');P.innerHTML='<div class="empty">불러오는 중…</div>';$('#homeStat').textContent=sb?'☁ 클라우드(Supabase)':'이 브라우저에만 저장됨';
+  try{const rows=await store.list();if(!rows.length){P.innerHTML='<div class="empty">아직 프로젝트가 없어요. 위 버튼으로 새 프로젝트를 만드세요.</div>';return;}
+    P.innerHTML=rows.map(r=>`<div class="pc ${r.code===proj.code?'cur':''}" data-code="${r.code}"><div class="th" style="${r.thumb?`background-image:url(${r.thumb})`:''}">${r.thumb?'':'미리보기 없음'}</div><div class="pb"><div class="pt" title="${r.title||''}">${r.title||'제목 없음'}</div><div class="pm">${r.slide_count||'?'}장 · ${new Date(r.updated_at).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})} · ${r.code}</div><div class="pa"><button data-a="open">열기</button><button data-a="copy">복사</button><button data-a="ren">이름</button><button data-a="del" class="danger">삭제</button></div></div></div>`).join('');
+    P.querySelectorAll('.pc').forEach(c=>{const code=c.dataset.code,title=c.querySelector('.pt').textContent;c.onclick=e=>{const a=e.target.dataset.a;
+      if(a==='copy')return copyProject(code,title);if(a==='ren')return renameProject(code,title);if(a==='del')return deleteProject(code,title);
+      if(dirty&&code!==proj.code&&!confirm('저장하지 않은 변경이 있습니다. 다른 프로젝트를 열까요?'))return;if(code===proj.code){closeHome();return;}openProject(code);};});}
+  catch(err){P.innerHTML=`<div class="empty">목록을 불러오지 못했습니다: ${err.message||err}<br>Supabase 테이블(carousel_projects)과 config.js 설정을 확인해 주세요.</div>`;}}
+function openHome(){$('#home').hidden=false;renderHome();}function closeHome(){$('#home').hidden=true;}
+$('#bHome').onclick=openHome;$('#hClose').onclick=()=>{if(proj.code||state.slides.length)closeHome();};
+$('#hNewT').onclick=()=>newProject(true);$('#hNewB').onclick=()=>newProject(false);
+$('#bSave').onclick=()=>saveProject(false);$('#pTitle').onclick=()=>{if(!proj.code){const t=prompt('프로젝트 이름',proj.title);if(t&&t.trim()){proj.title=t.trim();$('#pTitle').textContent=proj.title;}return;}renameProject(proj.code,proj.title);};
+addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveProject(false);}});
+addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
 /* ---------- boot ---------- */
 function renderAll(){$('#selSize').value=`${W()}x${H()}`;renderLeft();renderStage();renderRight();}
-load();registerFonts();hist=[snap()];hptr=0;showCode();
-document.fonts.ready.then(renderAll);renderAll();
-(async()=>{try{const u=new URL(location.href).searchParams.get('p');if(u&&sb)await cloudOpen(u.toUpperCase(),true);}catch(e){}})();
+const _commit=commit;commit=function(){_commit();markDirty();};
+(async()=>{
+  state=fresh();registerFonts();hist=[snap()];hptr=0;
+  await document.fonts.ready.catch(()=>{});
+  let code=null;try{code=new URL(location.href).searchParams.get('p')||localStorage.getItem(KEY+':code');}catch(e){}
+  if(code&&await openProject(code.toUpperCase()))return;
+  useProject(null,'제목 없음',fresh());openHome();
+})();
 </script></body></html>
