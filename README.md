@@ -14,6 +14,9 @@
 | `src/` | 템플릿(`studio.tpl.html`)·레이아웃 JSON·기본 사진(`assets.json`)·꾸불림 4개 서브셋+unicode-range(`fonts.json`)·빌드 스크립트 |
 | `.github/workflows/deploy-pages.yml` | (선택) wrangler로 Pages 배포 |
 
+## 글꼴
+기본 제공 글꼴 39종은 모두 무료·상업적 이용 가능한 SIL Open Font License입니다(배민 꾸불림 내장, 나머지는 Google Fonts·Pretendard CDN에서 선택 시 로드). 분류: 손글씨 · 제목 · 고딕 · 명조 · 장식 · 고정폭. 내 글꼴 파일(.ttf/.otf/.woff)도 프로젝트에 넣어 쓸 수 있습니다(파일의 라이선스는 직접 확인).
+
 ## 프로젝트
 앱을 열면 프로젝트 목록이 뜹니다. 템플릿/빈 프로젝트로 새로 만들기, 열기, 복사, 이름 변경, 삭제가 되고, 편집 중 8초 뒤 자동 저장(💾 저장 또는 Ctrl+S로 즉시 저장)됩니다. 주소의 `?p=코드`로 특정 프로젝트가 바로 열립니다. Supabase가 설정돼 있으면 클라우드(`carousel_projects`)에, 없으면 이 브라우저(localStorage)에만 저장됩니다.
 
