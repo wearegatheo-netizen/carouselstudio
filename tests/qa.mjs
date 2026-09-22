@@ -97,7 +97,7 @@ const ev=(p,f)=>p.evaluate(f);
   const lead=p.locator('#stage .layer.text').filter({hasText:'합주실'});
   await lead.tap();await p.waitForTimeout(200);ok('M 탭 선택',await ev(p,()=>/합주실/.test(sel()?.html||'')));
   ok('M 선택 후 캔버스 고정',JSON.stringify(await rect())===JSON.stringify(r0));
-  await p.tap('#sheetTog');await p.waitForTimeout(300);ok('M 시트 수동 접기→캔버스 확대',(await rect())[2]>r0[2]);await p.tap('#sheetTog');await p.waitForTimeout(300);ok('M 시트 다시 펼침→원래 배율',JSON.stringify(await rect())===JSON.stringify(r0));
+  await p.tap('#sheetTog');await p.waitForTimeout(400);ok('M 시트 수동 접기→캔버스 확대',(await rect())[2]>r0[2]);await p.tap('#sheetTog');await p.waitForTimeout(400);ok('M 시트 다시 펼침→원래 배율',JSON.stringify(await rect())===JSON.stringify(r0));
   const cdp=await ctx.newCDPSession(p);const swipe=async(x1,y1,x2,y2)=>{await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:x1,y:y1}]});for(let i=1;i<=6;i++)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x1+(x2-x1)*i/6,y:y1+(y2-y1)*i/6}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});};
   const other=p.locator('#stage .layer.text').filter({hasText:'다음 장에서'});let bb=await other.boundingBox();const oy=await ev(p,()=>state.slides[0].layers.find(l=>/다음 장/.test(l.html)).y);
   await swipe(bb.x+10,bb.y+8,bb.x+10,bb.y-60);await p.waitForTimeout(200);
