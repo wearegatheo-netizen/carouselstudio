@@ -1,0 +1,8 @@
+{
+  "name": "carouselstudio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Gather All Around 인스타그램 캐러셀 스튜디오 (정적 단일 HTML)",
+  "scripts": { "build": "cd src && node build.mjs" },
+  "devDependencies": { "html2canvas": "1.4.1" }
+}
