@@ -142,7 +142,6 @@ kbd{background:var(--ui3);border-radius:4px;padding:1px 5px;font-size:var(--fs-x
   <select id="selSize" style="width:auto" title="캔버스 크기"><option value="1080x1350">4:5 피드 1080×1350</option><option value="1080x1080">1:1 정사각 1080×1080</option><option value="1080x1920">9:16 스토리 1080×1920</option></select>
   <select id="selFmt" style="width:auto" title="저장 형식"><option value="png">PNG</option><option value="jpg">JPG</option></select>
   <button id="bPng">이 장 저장</button>
-  <button id="bExport" class="ic" title="작업 파일(.json) 내려받기">⤓ json</button><button id="bImport" class="ic" title="작업 파일(.json) 불러오기">⤒ json</button><input type="file" id="fImport" accept="application/json" hidden>
  </div>
  <div class="msg">요소 <b>클릭 → 드래그</b> 이동(가운데·여백선에 자동 스냅), <b>더블클릭</b> 문구 수정, 손잡이로 폭·회전. <kbd>Del</kbd> 삭제 · <kbd>←↑↓→</kbd> 이동(<kbd>Shift</kbd> 10px) · <kbd>Ctrl+C/V</kbd> 복사·붙여넣기(다른 장에도) · <kbd>Ctrl+D</kbd> 복제 · <kbd>Ctrl+Z</kbd> 되돌리기 · <kbd>Esc</kbd> 선택 해제</div>
 </header>
@@ -153,7 +152,7 @@ kbd{background:var(--ui3);border-radius:4px;padding:1px 5px;font-size:var(--fs-x
 </main>
 <div id="toast"></div>
 <div id="home" class="modal" hidden><div class="dlg">
- <div class="dh"><h2>프로젝트</h2><span id="homeStat" class="empty"></span><span style="flex:1"></span><button id="hNewT" class="primary">＋ 템플릿으로 새 프로젝트</button><button id="hNewB">＋ 빈 프로젝트</button><button id="hClose" class="ic" title="닫기">✕</button></div>
+ <div class="dh"><h2>프로젝트</h2><span id="homeStat" class="empty"></span><span style="flex:1"></span><button id="hNewT" class="primary">＋ 템플릿으로 새 프로젝트</button><button id="hNewB">＋ 빈 프로젝트</button><button id="bImport" class="ic" title="백업 파일(.json)에서 프로젝트 복원">백업 복원</button><input type="file" id="fImport" accept="application/json" hidden><button id="hClose" class="ic" title="닫기">✕</button></div>
  <div id="plist" class="plist"></div>
 </div></div>
 <input type="file" id="fPhoto" accept="image/*" hidden><input type="file" id="fImg" accept="image/*" hidden><input type="file" id="fFont" accept=".ttf,.otf,.woff,.woff2" hidden>
@@ -456,9 +455,9 @@ function renderRight(){
 $('#fPhoto').onchange=e=>{const f=e.target.files[0];if(!f)return;readImage(f,1600,d=>{slide().photo=d;commit();renderAll();toast('배경 사진 교체됨');});e.target.value='';};
 $('#fImg').onchange=e=>{const f=e.target.files[0];if(!f)return;readImage(f,1400,(d,w,h)=>{const l=sel();if(l&&l.type==='image'){l.src=d;}else{const mw=Math.min(w,W()-160);const nl={id:uid(),type:'image',x:80,y:300,w:mw,h:Math.round(h*mw/w),src:d,fit:'cover',radius:0,border:'#F5EFE4',borderA:100,borderW:0,rot:0,opacity:100};slide().layers.push(nl);selId=nl.id;}commit();renderAll();toast('이미지 추가됨');});e.target.value='';};
 $('#fFont').onchange=e=>{const f=e.target.files[0];if(!f)return;const name=f.name.replace(/\.[^.]+$/,'');const rd=new FileReader();rd.onload=async()=>{try{const ff=new FontFace(name,`url(${rd.result})`);await ff.load();document.fonts.add(ff);state.fonts=state.fonts.filter(x=>x.name!==name);state.fonts.push({name,data:rd.result});if(sel()&&sel().type==='text'){sel().font='custom:'+name;}commit();renderAll();toast(`글꼴 "${name}" 추가됨`);}catch(err){alert('글꼴을 불러오지 못했습니다: '+err.message);}};rd.readAsDataURL(f);e.target.value='';};
-$('#bExport').onclick=()=>{const a=document.createElement('a');a.download=`${proj.title||'carousel'}.json`;a.href=URL.createObjectURL(new Blob([JSON.stringify(state)],{type:'application/json'}));a.click();};
+async function exportProject(code,title){try{const data=code===proj.code?state:(await store.get(code))?.data;if(!data){alert('프로젝트를 찾을 수 없습니다.');return;}const a=document.createElement('a');a.download=`${(title||'carousel').replace(/[\\/:*?"<>|]/g,'_')}.json`;a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.click();toast('백업 파일 저장');}catch(err){alert('백업 실패: '+(err.message||err));}}
 $('#bImport').onclick=()=>$('#fImport').click();
-$('#fImport').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const s=JSON.parse(rd.result);if(!s.slides)throw 0;const t=prompt('불러온 작업의 프로젝트 이름',f.name.replace(/\.json$/,''))||'가져온 프로젝트';useProject(null,t,s);dirty=true;saveProject(true);toast('작업 파일을 새 프로젝트로 가져왔어요');}catch(err){alert('작업 파일 형식이 아닙니다.');}};rd.readAsText(f);e.target.value='';};
+$('#fImport').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const s=JSON.parse(rd.result);if(!s.slides)throw 0;const t=prompt('불러온 작업의 프로젝트 이름',f.name.replace(/\.json$/,''))||'가져온 프로젝트';useProject(null,t,s);dirty=true;saveProject(true);closeHome();toast('백업에서 새 프로젝트로 복원했어요');}catch(err){alert('작업 파일 형식이 아닙니다.');}};rd.readAsText(f);e.target.value='';};
 $('#bUndo').onclick=undo;$('#bRedo').onclick=redo;
 $('#selSize').onchange=e=>{const [w,h]=e.target.value.split('x').map(Number);const oh=H();state.size={w,h};fitCache=null;
   state.slides.forEach(s=>s.layers.forEach(l=>{if(l.y>oh*0.5)l.y=Math.round(l.y+(h-oh));}));zoom=null;commit();renderAll();toast(`캔버스 ${w}×${h} — 아래쪽 요소는 새 하단에 맞춰 이동했어요`);};
@@ -513,9 +512,9 @@ async function renameProject(code,title){const t=prompt('새 이름',title);if(t
 async function deleteProject(code,title){if(!confirm(`"${title}" 프로젝트를 삭제할까요? 되돌릴 수 없습니다.`))return;try{await store.del(code);if(code===proj.code){proj.code=null;setStat('미저장');history.replaceState(null,'','?');}toast('삭제됨');renderHome();}catch(err){alert('삭제 실패: '+(err.message||err));}}
 async function renderHome(){const P=$('#plist');P.innerHTML='<div class="empty">불러오는 중…</div>';$('#homeStat').textContent=sb?'☁ 클라우드(Supabase)':'이 브라우저에만 저장됨';
   try{const rows=await store.list();if(!rows.length){P.innerHTML='<div class="empty">아직 프로젝트가 없어요. 위 버튼으로 새 프로젝트를 만드세요.</div>';return;}
-    P.innerHTML=rows.map(r=>`<div class="pc ${r.code===proj.code?'cur':''}" data-code="${r.code}"><div class="th" style="${r.thumb?`background-image:url(${r.thumb})`:''}">${r.thumb?'':'미리보기 없음'}</div><div class="pb"><div class="pt" title="${esc(r.title)}">${esc(r.title)||'제목 없음'}</div><div class="pm">${r.slide_count||'?'}장 · ${new Date(r.updated_at).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})} · ${r.code}</div><div class="pa"><button data-a="open">열기</button><button data-a="copy">복사</button><button data-a="ren">이름</button><button data-a="del" class="danger">삭제</button></div></div></div>`).join('');
+    P.innerHTML=rows.map(r=>`<div class="pc ${r.code===proj.code?'cur':''}" data-code="${r.code}"><div class="th" style="${r.thumb?`background-image:url(${r.thumb})`:''}">${r.thumb?'':'미리보기 없음'}</div><div class="pb"><div class="pt" title="${esc(r.title)}">${esc(r.title)||'제목 없음'}</div><div class="pm">${r.slide_count||'?'}장 · ${new Date(r.updated_at).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})} · ${r.code}</div><div class="pa"><button data-a="open">열기</button><button data-a="copy">복사</button><button data-a="ren">이름</button><button data-a="bak" title="백업 파일(.json) 내려받기">백업</button><button data-a="del" class="danger">삭제</button></div></div></div>`).join('');
     P.querySelectorAll('.pc').forEach(c=>{const code=c.dataset.code,title=c.querySelector('.pt').textContent;c.onclick=e=>{const a=e.target.dataset.a;
-      if(a==='copy')return copyProject(code,title);if(a==='ren')return renameProject(code,title);if(a==='del')return deleteProject(code,title);
+      if(a==='copy')return copyProject(code,title);if(a==='bak')return exportProject(code,title);if(a==='ren')return renameProject(code,title);if(a==='del')return deleteProject(code,title);
       if(dirty&&code!==proj.code&&!confirm('저장하지 않은 변경이 있습니다. 다른 프로젝트를 열까요?'))return;if(code===proj.code){closeHome();return;}openProject(code);};});}
   catch(err){P.innerHTML=`<div class="empty">목록을 불러오지 못했습니다: ${err.message||err}<br>Supabase 테이블(carousel_projects)과 config.js 설정을 확인해 주세요.</div>`;}}
 function openHome(){$('#home').hidden=false;renderHome();}function closeHome(){$('#home').hidden=true;}

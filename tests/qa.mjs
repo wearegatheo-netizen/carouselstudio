@@ -80,7 +80,7 @@ const ev=(p,f)=>p.evaluate(f);
   ok('D 현재 프로젝트 삭제 후 상태',await ev(p,()=>proj.code===null&&$('.pc')!==null));
   await p.locator('.pc [data-a=open]').first().click();await p.waitForTimeout(500);
   // json 내보내기/가져오기
-  const dl=p.waitForEvent('download');await p.click('#bExport');const d=await dl;const jp='/tmp/qa-export.json';await d.saveAs(jp);ok('D json 내보내기',fs.existsSync(jp)&&JSON.parse(fs.readFileSync(jp)).slides.length>0);
+  await p.click('#bHome');await p.waitForTimeout(300);const dl=p.waitForEvent('download');await p.locator('.pc [data-a=bak]').first().click();const d=await dl;const jp='/tmp/qa-export.json';await d.saveAs(jp);await p.waitForTimeout(200);ok('D json 백업',fs.existsSync(jp)&&JSON.parse(fs.readFileSync(jp)).slides.length>0);
   p.setPrompt('가져옴');await p.setInputFiles('#fImport',jp);await p.waitForTimeout(1200);ok('D json 가져오기→새 프로젝트',await ev(p,()=>proj.title==='가져옴'&&!!proj.code));
   // 새로고침 후 마지막 프로젝트
   await p.reload({waitUntil:'load'});await p.waitForTimeout(900);ok('D 새로고침 복원',await ev(p,()=>proj.title==='가져옴'&&$('#home').hidden));
