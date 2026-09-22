@@ -95,7 +95,7 @@ kbd{background:var(--ui3);border-radius:4px;padding:1px 5px;font-size:var(--fs-x
 .sheetBar{display:none}
 @media (pointer:coarse){#stage .layer .hd{width:26px;height:26px}#stage .layer .hd.e{right:-14px;margin-top:-13px}#stage .layer .hd.se{right:-14px;bottom:-14px}#stage .layer .hd.rot{top:-48px;margin-left:-13px}:root{--h-sm:34px;--h-md:40px;--fs:14px;--fs-sm:13px;--fs-xs:12px}}
 @media (max-width:900px){
- header{padding:6px 8px;gap:5px}header h1{font-size:17px;margin-right:0}header .msg{display:none}header .lbl{display:none}#pTitle{max-width:110px!important;flex:1}
+ header{padding:6px 8px;gap:5px;flex-wrap:nowrap}header h1{display:none}header .msg{display:none}header .lbl{display:none}#pTitle{max-width:none!important;flex:1;min-width:0}#saveStat{min-width:0!important;white-space:nowrap}#bPngAll{padding:0 10px}#bPngAll::before{content:'⤓';}#bPngAll .lbl2{display:none}
  #bMore{display:inline-flex;margin-left:auto}
  .more{display:none;position:absolute;right:8px;top:48px;z-index:15;background:var(--ui2);border:1px solid var(--line);border-radius:12px;padding:10px;flex-direction:column;gap:8px;box-shadow:0 12px 40px rgba(0,0,0,.6)}.more.open{display:flex}.more select{width:100%}
  main{display:flex;flex-direction:column}
@@ -113,7 +113,7 @@ kbd{background:var(--ui3);border-radius:4px;padding:1px 5px;font-size:var(--fs-x
 <header>
  <h1>캐러셀 스튜디오</h1>
  <button id="bHome">📁 <span class="lbl">프로젝트</span></button><button id="pTitle" title="클릭해서 이름 변경" style="max-width:220px;overflow:hidden;text-overflow:ellipsis">제목 없음</button><button id="bSave" title="Ctrl+S">💾 <span class="lbl">저장</span></button><span id="saveStat" style="font-size:12px;color:var(--muted);min-width:44px"></span>
- <button id="bPngAll" class="primary">전체 저장</button>
+ <button id="bPngAll" class="primary"><span class="lbl2">전체 저장</span></button>
  <button id="bMore" class="ic" title="더 보기">⋯</button>
  <div class="more" id="more">
   <button id="bUndo" class="ic" title="Ctrl+Z">↶ 되돌리기</button><button id="bRedo" class="ic" title="Ctrl+Y">↷ 다시</button>
@@ -196,7 +196,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const uid=()=>'L'+Math.random().toString(36).slice(2,8);
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);}
-function fresh(){return {size:{w:1080,h:1350},slides:clone(TEMPLATE).map(s=>({...s,layers:s.layers.map(l=>({...l,radius:(l.type==='text'&&l.bgA===0&&l.borderW===0)?0:l.radius}))})),fonts:[]};}
+function fresh(){return {size:{w:1080,h:1350},slides:clone(TEMPLATE).map(s=>({...s,layers:s.layers.map(l=>({...l,radius:(l.type==='text'&&l.bgA===0&&l.borderW===0)?0:l.radius,nowrap:l.type==='text'&&!/<br/.test(l.html)}))})),fonts:[]};}
 function save(){}
 function snap(){return JSON.stringify({slides:state.slides,size:state.size});}
 let commit=function(){hist=hist.slice(0,hptr+1);hist.push(snap());if(hist.length>100)hist.shift();hptr=hist.length-1;save();}
@@ -233,7 +233,7 @@ function buildLayer(l,edit){
     if(l.italic)d.style.fontStyle='italic';if(l.upper)d.style.textTransform='uppercase';
     if(l.shadow)d.style.textShadow=`0 ${Math.round(l.size*.06)}px ${Math.round(l.size*.18)}px rgba(0,0,0,.65)`;
     if(l.bgA>0)d.style.background=rgba(l.bg,l.bgA);if(l.borderW>0)d.style.border=`${l.borderW}px solid ${rgba(l.border,l.borderA)}`;d.style.borderRadius=l.radius+'px';d.style.padding=`${l.pad}px ${l.padX}px`;
-    const tx=document.createElement('div');tx.className='tx';tx.innerHTML=l.html;d.appendChild(tx);
+    const tx=document.createElement('div');tx.className='tx';if(l.nowrap)tx.style.whiteSpace='nowrap';tx.innerHTML=l.html;d.appendChild(tx);
   }
   if(edit&&l.id===selId){d.classList.add('sel');if(l.lock)return d;const h=document.createElement('div');h.className='hd '+(l.type==='text'?'e':'se');d.appendChild(h);const r=document.createElement('div');r.className='hd rot';r.title='드래그해서 회전';d.appendChild(r);}
   return d;
@@ -261,7 +261,7 @@ function renderLeft(){
 }
 /* ---------- canvas ---------- */
 let scale=1,fitCache=null;
-function fitScale(){const wrap=$('#wrap');const hh=isMobile()?(innerHeight-wrap.getBoundingClientRect().top-innerHeight*0.44-20):wrap.clientHeight-48;return Math.min((wrap.clientWidth-(isMobile()?20:48))/W(),hh/H());}
+function fitScale(){const wrap=$('#wrap');const hh=isMobile()?wrap.clientHeight-20:wrap.clientHeight-48;return Math.min((wrap.clientWidth-(isMobile()?20:48))/W(),hh/H());}
 function renderStage(){
   const st=$('#stage');st.innerHTML='';st.appendChild(buildSlide(slide(),cur,true));
   scale=zoom||(fitCache??(fitCache=fitScale()));
@@ -402,7 +402,7 @@ function renderRight(){
     <div class="sec"><h3>정렬 · 부분 서식</h3>${field('정렬',`<div class="seg">${['left','center','right'].map(a=>`<button data-k="align" data-v="${a}" class="${l.align===a?'on':''}">${{left:'왼쪽',center:'가운데',right:'오른쪽'}[a]}</button>`).join('')}</div>`)}
     <div class="fmt" title="${ed?'선택한 글자에 적용':'문구 수정 중 글자를 드래그해 선택한 뒤 적용'}"><button data-f="bold" ${ed?'':'disabled'}><b>B</b></button><button data-f="italic" ${ed?'':'disabled'}><i>I</i></button><button data-f="underline" ${ed?'':'disabled'}><u>U</u></button><button data-f="em" ${ed?'':'disabled'} style="color:var(--amber)">강조</button><button data-f="clear" ${ed?'':'disabled'} title="서식 지우기">✕</button></div>${ed?'':'<div class="empty">부분 서식은 [문구 수정] 중에만 적용됩니다.</div>'}</div>`,
    '효과':`<div class="sec"><h3>간격</h3><div class="g2">${field('줄간격',`<input type="number" data-k="lh" value="${l.lh}" step="0.05" min="0.7" max="3">`)}${field('자간(em)',`<input type="number" data-k="ls" value="${l.ls}" step="0.01" min="-0.2" max="1">`)}</div></div>
-    <div class="sec"><h3>효과</h3>${field('스타일',`<div class="seg"><button data-b="shadow" class="${l.shadow?'on':''}">그림자</button><button data-b="italic" class="${l.italic?'on':''}">기울임</button><button data-b="upper" class="${l.upper?'on':''}">대문자</button></div>`)}
+    <div class="sec"><h3>효과</h3>${field('스타일',`<div class="seg"><button data-b="shadow" class="${l.shadow?'on':''}">그림자</button><button data-b="italic" class="${l.italic?'on':''}">기울임</button><button data-b="upper" class="${l.upper?'on':''}">대문자</button><button data-b="nowrap" class="${l.nowrap?'on':''}" title="폭이 모자라도 줄을 바꾸지 않음">한 줄</button></div>`)}
     ${field('투명도',`<input type="range" min="5" max="100" data-k="opacity" value="${l.opacity??100}">`)}</div>`,
    '모양':`<div class="sec"><h3>배경 (칩·버튼 모양)</h3>${colorField('배경색','bg','bgA')}</div>
     <div class="sec"><h3>테두리</h3>${colorField('테두리색','border','borderA')}<div class="g2">${field('굵기',`<input type="number" data-k="borderW" value="${l.borderW}" min="0" max="20" step="0.5">`)}${field('둥글기',`<input type="number" data-k="radius" value="${l.radius}" min="0" max="999">`)}</div></div>
@@ -451,7 +451,7 @@ async function renderPNG(i){
 function saveCanvas(c,name){const jpg=$('#selFmt').value==='jpg';const a=document.createElement('a');a.download=name+(jpg?'.jpg':'.png');a.href=jpg?c.toDataURL('image/jpeg',.92):c.toDataURL('image/png');a.click();}
 const fname=i=>`${(proj.title||'carousel').replace(/[\\/:*?"<>|]/g,'_')}-${String(i+1).padStart(2,'0')}`;
 $('#bPng').onclick=async e=>{const b=e.target;b.disabled=true;try{saveCanvas(await renderPNG(cur),fname(cur));toast('저장됨');}catch(err){alert('이미지를 만들지 못했습니다: '+err.message);}b.disabled=false;};
-$('#bPngAll').onclick=async e=>{const b=e.target;b.disabled=true;const t=b.textContent;try{for(let i=0;i<state.slides.length;i++){b.textContent=`${i+1}/${state.slides.length}…`;saveCanvas(await renderPNG(i),fname(i));await new Promise(r=>setTimeout(r,700));}toast(`${state.slides.length}장 저장됨`);}catch(err){alert('이미지를 만들지 못했습니다: '+err.message);}b.disabled=false;b.textContent=t;};
+$('#bPngAll').onclick=async e=>{const b=$('#bPngAll');b.disabled=true;const t=b.innerHTML;try{for(let i=0;i<state.slides.length;i++){b.textContent=`${i+1}/${state.slides.length}…`;saveCanvas(await renderPNG(i),fname(i));await new Promise(r=>setTimeout(r,700));}toast(`${state.slides.length}장 저장됨`);}catch(err){alert('이미지를 만들지 못했습니다: '+err.message);}b.disabled=false;b.innerHTML=t;};
 /* ---------- projects (Supabase 또는 브라우저 저장소) ---------- */
 const CFG=window.CAROUSEL_CONFIG||{};let sb=null;
 try{if(CFG.supabaseUrl&&CFG.supabaseAnonKey&&window.supabase)sb=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey);}catch(e){console.error(e);}
@@ -470,12 +470,13 @@ let proj={code:null,title:'제목 없음'}, dirty=false, saving=false, autoT=nul
 function setStat(t){$('#saveStat').textContent=t;}
 function markDirty(){dirty=true;setStat('수정됨');clearTimeout(autoT);autoT=setTimeout(()=>{if(dirty&&proj.code&&!editingId)saveProject(true);},8000);}
 async function thumbOf(){try{const c=await renderPNG(0);const t=document.createElement('canvas');t.width=216;t.height=Math.round(216*H()/W());t.getContext('2d').drawImage(c,0,0,t.width,t.height);return t.toDataURL('image/jpeg',.7);}catch(e){return null;}}
+const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('네트워크 응답이 없습니다(시간 초과)')),ms))]);
 async function saveProject(auto){if(saving)return;saving=true;setStat('저장 중…');try{
   if(!proj.code)proj.code=newCode();
   const row={code:proj.code,title:proj.title,data:state,slide_count:state.slides.length,thumb:await thumbOf(),updated_at:new Date().toISOString()};
-  await store.put(row);dirty=false;setStat('저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));
+  await withTimeout(store.put(row),25000);dirty=false;setStat('저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}));
   try{localStorage.setItem(KEY+':code',proj.code);}catch(e){}history.replaceState(null,'',`?p=${proj.code}`);if(!auto)toast('프로젝트 저장됨');}
-  catch(err){console.error(err);setStat('저장 실패');if(!auto)alert('저장 실패: '+(err.message||err));}saving=false;}
+  catch(err){console.error(err);setStat('저장 실패 · 다시 시도');dirty=true;if(!auto)alert('저장 실패: '+(err.message||err));else{clearTimeout(autoT);autoT=setTimeout(()=>{if(dirty&&proj.code)saveProject(true);},30000);}}saving=false;}
 function useProject(code,title,data){fitCache=null;zoom=null;proj={code,title};state=data;state.size=state.size||{w:1080,h:1350};state.fonts=state.fonts||[];registerFonts();cur=0;selId=null;editingId=null;hist=[snap()];hptr=0;dirty=false;
   $('#pTitle').textContent=title;document.title=title+' · 캐러셀 스튜디오';setStat(code?'':'미저장');if(code){history.replaceState(null,'',`?p=${code}`);try{localStorage.setItem(KEY+':code',code);}catch(e){}}renderAll();}
 async function openProject(code,silent){try{const r=await store.get(code);if(!r){if(!silent)alert('프로젝트를 찾을 수 없습니다.');return false;}useProject(r.code,r.title,r.data);closeHome();toast(`"${r.title}" 열림`);return true;}catch(err){alert('불러오기 실패: '+(err.message||err));return false;}}
@@ -505,7 +506,7 @@ addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='
 function renderAll(){$('#selSize').value=`${W()}x${H()}`;renderLeft();renderStage();renderRight();}
 const _commit=commit;commit=function(){_commit();markDirty();};
 (async()=>{
-  state=fresh();registerFonts();hist=[snap()];hptr=0;
+  ensureFont('body');state=fresh();registerFonts();hist=[snap()];hptr=0;
   await document.fonts.ready.catch(()=>{});
   let code=null;try{code=new URL(location.href).searchParams.get('p')||localStorage.getItem(KEY+':code');}catch(e){}
   if(code&&await openProject(code.toUpperCase(),true))return;
