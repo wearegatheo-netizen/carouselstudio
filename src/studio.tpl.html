@@ -194,6 +194,7 @@ let state, cur=0, selId=null, editingId=null, hist=[], hptr=-1, clip=null, zoom=
 const $=(s,r=document)=>r.querySelector(s);
 const clone=o=>JSON.parse(JSON.stringify(o));
 const uid=()=>'L'+Math.random().toString(36).slice(2,8);
+const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);}
 function fresh(){return {size:{w:1080,h:1350},slides:clone(TEMPLATE).map(s=>({...s,layers:s.layers.map(l=>({...l,radius:(l.type==='text'&&l.bgA===0&&l.borderW===0)?0:l.radius}))})),fonts:[]};}
 function save(){}
@@ -234,7 +235,7 @@ function buildLayer(l,edit){
     if(l.bgA>0)d.style.background=rgba(l.bg,l.bgA);if(l.borderW>0)d.style.border=`${l.borderW}px solid ${rgba(l.border,l.borderA)}`;d.style.borderRadius=l.radius+'px';d.style.padding=`${l.pad}px ${l.padX}px`;
     const tx=document.createElement('div');tx.className='tx';tx.innerHTML=l.html;d.appendChild(tx);
   }
-  if(edit&&l.id===selId&&!l.lock){d.classList.add('sel');const h=document.createElement('div');h.className='hd '+(l.type==='text'?'e':'se');d.appendChild(h);const r=document.createElement('div');r.className='hd rot';r.title='드래그해서 회전';d.appendChild(r);}
+  if(edit&&l.id===selId){d.classList.add('sel');if(l.lock)return d;const h=document.createElement('div');h.className='hd '+(l.type==='text'?'e':'se');d.appendChild(h);const r=document.createElement('div');r.className='hd rot';r.title='드래그해서 회전';d.appendChild(r);}
   return d;
 }
 /* ---------- left ---------- */
@@ -306,7 +307,7 @@ stage.addEventListener('pointerdown',e=>{
 });
 stage.addEventListener('dblclick',e=>{const ly=e.target.closest('.layer.text');if(!ly)return;const l=slide().layers.find(x=>x.id===ly.dataset.id);if(l.lock)return;selId=l.id;editingId=selId;renderStage();renderRight();});
 function stopEdit(){if(!editingId)return;const el=stage.querySelector(`.layer[data-id="${editingId}"] .tx`);const l=slide().layers.find(x=>x.id===editingId);
-  if(el&&l){const h=el.innerHTML.replace(/<div>/g,'<br>').replace(/<\/div>/g,'').replace(/&nbsp;/g,' ').replace(/<br>$/,'').trim();if(h!==l.html){l.html=h||'　';commit();}}
+  if(el&&l){const h=el.innerHTML.replace(/<div><br><\/div>/g,'<br>').replace(/<div>/g,'<br>').replace(/<\/div>/g,'').replace(/&nbsp;/g,' ').replace(/<br>$/,'').trim();if(h!==l.html){l.html=h||'　';commit();}}
   editingId=null;renderStage();renderLeft();renderRight();}
 stage.addEventListener('focusout',e=>{if(editingId&&e.target.classList.contains('tx'))setTimeout(()=>{if(editingId&&!stage.contains(document.activeElement)&&!document.activeElement.closest?.('#right'))stopEdit();},50);});
 function fmt(cmd,val){const el=stage.querySelector(`.layer[data-id="${editingId}"] .tx`);if(!el)return;el.focus();
@@ -339,7 +340,7 @@ const TXT=()=>({id:uid(),type:'text',x:80,y:400,w:W()-160,html:'',font:'body',si
 /* ---------- right ---------- */
 function field(label,inner){return `<div class="f"><span>${label}</span>${inner}</div>`;}
 function colorField(label,key,akey){const o=sel()||slide();return `<div class="f inline"><span>${label}</span><input type="color" data-k="${key}" value="${o[key]||'#F0A83B'}">${akey?`<input type="range" min="0" max="100" data-k="${akey}" value="${o[akey]}" title="투명도">`:'<span></span>'}</div><div class="sw" data-for="${key}">${SWATCH.map(c=>`<i style="background:${c}" data-c="${c}"></i>`).join('')}</div>`;}
-function layerName(l){if(l.type==='text')return l.html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,22)||'(빈 글자)';if(l.type==='image')return '이미지';return l.h<=2?'구분선':'상자';}
+function layerName(l){if(l.type==='text')return esc(l.html.replace(/<[^>]+>/g,' ').replace(/&[a-z]+;/g,' ').replace(/\s+/g,' ').trim().slice(0,22))||'(빈 글자)';if(l.type==='image')return '이미지';return l.h<=2?'구분선':'상자';}
 function layersPanel(){const s=slide();return `<div class="sec"><h3>레이어 <span style="font-weight:400;text-transform:none">${s.layers.length}개 · 위가 앞</span></h3>${[...s.layers].reverse().map(l=>`<div class="lyr ${l.id===selId?'sel':''}" data-id="${l.id}"><span class="t">${{text:'글자',box:'상자',image:'그림'}[l.type]}</span><span class="nm">${layerName(l)}</span><button data-t="hidden" class="${l.hidden?'off':''}" title="보기/숨기기">👁</button><button data-t="lock" class="${l.lock?'':'off'}" title="잠금">🔒</button></div>`).join('')||'<div class="empty">요소가 없습니다.</div>'}</div>`;}
 function tabsHTML(list,curT,who){return `<div class="tabs">${list.map(t=>`<button data-tab="${t}" data-who="${who}" class="${t===curT?'on':''}">${t}</button>`).join('')}</div>`;}
 function renderRight(){
@@ -476,8 +477,8 @@ async function saveProject(auto){if(saving)return;saving=true;setStat('저장 �
   try{localStorage.setItem(KEY+':code',proj.code);}catch(e){}history.replaceState(null,'',`?p=${proj.code}`);if(!auto)toast('프로젝트 저장됨');}
   catch(err){console.error(err);setStat('저장 실패');if(!auto)alert('저장 실패: '+(err.message||err));}saving=false;}
 function useProject(code,title,data){fitCache=null;zoom=null;proj={code,title};state=data;state.size=state.size||{w:1080,h:1350};state.fonts=state.fonts||[];registerFonts();cur=0;selId=null;editingId=null;hist=[snap()];hptr=0;dirty=false;
-  $('#pTitle').textContent=title;setStat(code?'':'미저장');if(code){history.replaceState(null,'',`?p=${code}`);try{localStorage.setItem(KEY+':code',code);}catch(e){}}renderAll();}
-async function openProject(code){try{const r=await store.get(code);if(!r){alert('프로젝트를 찾을 수 없습니다.');return false;}useProject(r.code,r.title,r.data);closeHome();toast(`"${r.title}" 열림`);return true;}catch(err){alert('불러오기 실패: '+(err.message||err));return false;}}
+  $('#pTitle').textContent=title;document.title=title+' · 캐러셀 스튜디오';setStat(code?'':'미저장');if(code){history.replaceState(null,'',`?p=${code}`);try{localStorage.setItem(KEY+':code',code);}catch(e){}}renderAll();}
+async function openProject(code,silent){try{const r=await store.get(code);if(!r){if(!silent)alert('프로젝트를 찾을 수 없습니다.');return false;}useProject(r.code,r.title,r.data);closeHome();toast(`"${r.title}" 열림`);return true;}catch(err){alert('불러오기 실패: '+(err.message||err));return false;}}
 async function newProject(fromTemplate){if(dirty&&!confirm('저장하지 않은 변경이 있습니다. 새 프로젝트를 만들까요?'))return;
   const title=prompt('프로젝트 이름',fromTemplate?'게더 올 어라운드 팀 모집':'새 캐러셀');if(title===null)return;
   const data=fromTemplate?fresh():{size:{w:1080,h:1350},fonts:[],slides:[{id:'S'+uid(),photo:'',px:50,py:50,zoom:100,sh:55,shA:92,bg:'#14110E',pager:true,layers:[]}]};
@@ -489,7 +490,7 @@ async function renameProject(code,title){const t=prompt('새 이름',title);if(t
 async function deleteProject(code,title){if(!confirm(`"${title}" 프로젝트를 삭제할까요? 되돌릴 수 없습니다.`))return;try{await store.del(code);if(code===proj.code){proj.code=null;setStat('미저장');history.replaceState(null,'','?');}toast('삭제됨');renderHome();}catch(err){alert('삭제 실패: '+(err.message||err));}}
 async function renderHome(){const P=$('#plist');P.innerHTML='<div class="empty">불러오는 중…</div>';$('#homeStat').textContent=sb?'☁ 클라우드(Supabase)':'이 브라우저에만 저장됨';
   try{const rows=await store.list();if(!rows.length){P.innerHTML='<div class="empty">아직 프로젝트가 없어요. 위 버튼으로 새 프로젝트를 만드세요.</div>';return;}
-    P.innerHTML=rows.map(r=>`<div class="pc ${r.code===proj.code?'cur':''}" data-code="${r.code}"><div class="th" style="${r.thumb?`background-image:url(${r.thumb})`:''}">${r.thumb?'':'미리보기 없음'}</div><div class="pb"><div class="pt" title="${r.title||''}">${r.title||'제목 없음'}</div><div class="pm">${r.slide_count||'?'}장 · ${new Date(r.updated_at).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})} · ${r.code}</div><div class="pa"><button data-a="open">열기</button><button data-a="copy">복사</button><button data-a="ren">이름</button><button data-a="del" class="danger">삭제</button></div></div></div>`).join('');
+    P.innerHTML=rows.map(r=>`<div class="pc ${r.code===proj.code?'cur':''}" data-code="${r.code}"><div class="th" style="${r.thumb?`background-image:url(${r.thumb})`:''}">${r.thumb?'':'미리보기 없음'}</div><div class="pb"><div class="pt" title="${esc(r.title)}">${esc(r.title)||'제목 없음'}</div><div class="pm">${r.slide_count||'?'}장 · ${new Date(r.updated_at).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})} · ${r.code}</div><div class="pa"><button data-a="open">열기</button><button data-a="copy">복사</button><button data-a="ren">이름</button><button data-a="del" class="danger">삭제</button></div></div></div>`).join('');
     P.querySelectorAll('.pc').forEach(c=>{const code=c.dataset.code,title=c.querySelector('.pt').textContent;c.onclick=e=>{const a=e.target.dataset.a;
       if(a==='copy')return copyProject(code,title);if(a==='ren')return renameProject(code,title);if(a==='del')return deleteProject(code,title);
       if(dirty&&code!==proj.code&&!confirm('저장하지 않은 변경이 있습니다. 다른 프로젝트를 열까요?'))return;if(code===proj.code){closeHome();return;}openProject(code);};});}
@@ -507,7 +508,8 @@ const _commit=commit;commit=function(){_commit();markDirty();};
   state=fresh();registerFonts();hist=[snap()];hptr=0;
   await document.fonts.ready.catch(()=>{});
   let code=null;try{code=new URL(location.href).searchParams.get('p')||localStorage.getItem(KEY+':code');}catch(e){}
-  if(code&&await openProject(code.toUpperCase()))return;
+  if(code&&await openProject(code.toUpperCase(),true))return;
+  try{localStorage.removeItem(KEY+':code');}catch(e){}
   useProject(null,'제목 없음',fresh());openHome();
 })();
 </script></body></html>
