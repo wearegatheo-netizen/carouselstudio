@@ -1,6 +1,6 @@
 # Carousel Studio — Gather All Around 인스타그램 캐러셀 제작 도구
 
-`index.html` 한 파일로 동작하는 정적 웹앱입니다. 슬라이드 순서 변경·삭제, 문구 드래그 이동·수정·삭제, 글꼴·색상·테두리 편집, 사진 교체, 1080×1350 PNG 내보내기를 브라우저에서 바로 처리합니다.
+`index.html` 한 파일로 동작하는 정적 웹앱입니다. 슬라이드 순서 변경·삭제·복제, 요소(글자·상자·이미지) 드래그 이동·회전·폭 조절(가운데·여백선 스냅), 더블클릭 문구 수정과 부분 서식(굵게·기울임·밑줄·강조색), 글꼴(내 폰트 파일 포함)·색상·그림자·칩 모양 편집, 레이어 목록(숨김·잠금·순서), 다른 장으로 복사·붙여넣기, 캔버스 크기(4:5·1:1·9:16), PNG/JPG 내보내기를 브라우저에서 바로 처리합니다.
 
 ## 구성
 | 경로 | 설명 |
@@ -10,7 +10,7 @@
 | `supabase/migrations/20260922_carousel_projects.sql` | `carousel_projects` 테이블 + RLS |
 | `_headers` | Cloudflare 응답 헤더 (dist/에 복사됨) |
 | `wrangler.jsonc` | Cloudflare Workers 정적 에셋 설정 (`dist/`) |
-| `src/` | 템플릿(`studio.tpl.html`)·레이아웃 JSON·에셋·빌드 스크립트 |
+| `src/` | 템플릿(`studio.tpl.html`)·레이아웃 JSON·기본 사진(`assets.json`)·꾸불림 4개 서브셋+unicode-range(`fonts.json`)·빌드 스크립트 |
 | `.github/workflows/deploy-pages.yml` | (선택) wrangler로 Pages 배포 |
 
 ## 저장 방식
