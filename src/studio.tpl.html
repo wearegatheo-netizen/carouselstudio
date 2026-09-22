@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Gather All Around 캐러셀 스튜디오</title>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
@@ -81,24 +81,47 @@ kbd{background:var(--ui3);border-radius:4px;padding:1px 5px;font-size:11px}
 .pc .pa{display:flex;gap:4px;margin-top:4px}.pc .pa button{flex:1;padding:4px 2px;font-size:11px}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--amber);color:#1a1408;padding:9px 16px;border-radius:999px;font-weight:700;opacity:0;transition:.25s;pointer-events:none;z-index:9}
 #toast.show{opacity:1}
-@media (max-width:900px){main{grid-template-columns:1fr}aside{display:none}}
+.more{display:contents}
+#bMore{display:none}
+.sheetBar{display:none}
+#stage{touch-action:none}
+@media (pointer:coarse){#stage .layer .hd{width:26px;height:26px}#stage .layer .hd.e{right:-14px;margin-top:-13px}#stage .layer .hd.se{right:-14px;bottom:-14px}#stage .layer .hd.rot{top:-48px;margin-left:-13px}button{padding:9px 11px}.lyr{padding:8px 6px}}
+@media (max-width:900px){
+ body{font-size:14px}
+ header{padding:6px 8px;gap:5px}header h1{font-size:17px;margin-right:0}header .msg{display:none}header .lbl{display:none}#pTitle{max-width:110px!important;flex:1}#bPngAll{padding:7px 9px}
+ #bMore{display:inline-block;margin-left:auto}
+ .more{display:none;position:absolute;right:8px;top:48px;z-index:15;background:var(--ui2);border:1px solid var(--line);border-radius:12px;padding:10px;flex-direction:column;gap:8px;box-shadow:0 12px 40px rgba(0,0,0,.6)}.more.open{display:flex}.more select{width:100%}
+ main{display:flex;flex-direction:column}
+ aside#left{flex-direction:row;overflow-x:auto;overflow-y:hidden;border-right:0;border-bottom:1px solid var(--line);padding:6px 8px;gap:6px;flex:none;order:0}
+ aside#left .thumb{flex:none;width:56px;padding:3px;gap:0}aside#left .thumb .tb{display:none}aside#left>button{flex:none;white-space:nowrap;padding:0 10px;font-size:12px}
+ .canvasWrap{flex:1;min-height:0;padding:10px;order:1}
+ .zoombar{right:8px;bottom:8px}
+ aside.right{order:2;border-left:0;border-top:1px solid var(--line);height:44vh;flex:none;padding:0;transition:height .2s}
+ aside.right.collapsed{height:40px}aside.right.collapsed #right{display:none}
+ .sheetBar{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;font-weight:700;color:var(--muted);position:sticky;top:0;background:var(--ui);z-index:2;border-bottom:1px solid var(--line)}
+ #right{padding:10px;display:flex;flex-direction:column;gap:8px}
+ .plist{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:10px}.dh{flex-wrap:wrap;padding:10px}.dh h2{font-size:19px}
+ .g3{grid-template-columns:1fr 1fr 1fr}
+}
 </style></head><body>
 <header>
  <h1>캐러셀 스튜디오</h1>
- <button id="bUndo" class="ic" title="Ctrl+Z">↶</button><button id="bRedo" class="ic" title="Ctrl+Y">↷</button>
- <span class="sep"></span>
- <select id="selSize" style="width:auto" title="캔버스 크기"><option value="1080x1350">4:5 피드 1080×1350</option><option value="1080x1080">1:1 정사각 1080×1080</option><option value="1080x1920">9:16 스토리 1080×1920</option></select>
- <select id="selFmt" style="width:auto" title="저장 형식"><option value="png">PNG</option><option value="jpg">JPG</option></select>
- <button id="bPng">이 장 저장</button><button id="bPngAll" class="primary">전체 저장</button>
- <span class="sep"></span>
- <button id="bHome">📁 프로젝트</button><button id="pTitle" title="클릭해서 이름 변경" style="max-width:220px;overflow:hidden;text-overflow:ellipsis">제목 없음</button><button id="bSave" title="Ctrl+S">💾 저장</button><span id="saveStat" style="font-size:12px;color:var(--muted);min-width:60px"></span>
- <button id="bExport" class="ic" title="작업 파일(.json) 내려받기">⤓ json</button><button id="bImport" class="ic" title="작업 파일(.json) 불러오기">⤒ json</button><input type="file" id="fImport" accept="application/json" hidden>
+ <button id="bHome">📁 <span class="lbl">프로젝트</span></button><button id="pTitle" title="클릭해서 이름 변경" style="max-width:220px;overflow:hidden;text-overflow:ellipsis">제목 없음</button><button id="bSave" title="Ctrl+S">💾 <span class="lbl">저장</span></button><span id="saveStat" style="font-size:12px;color:var(--muted);min-width:44px"></span>
+ <button id="bPngAll" class="primary">전체 저장</button>
+ <button id="bMore" class="ic" title="더 보기">⋯</button>
+ <div class="more" id="more">
+  <button id="bUndo" class="ic" title="Ctrl+Z">↶ 되돌리기</button><button id="bRedo" class="ic" title="Ctrl+Y">↷ 다시</button>
+  <select id="selSize" style="width:auto" title="캔버스 크기"><option value="1080x1350">4:5 피드 1080×1350</option><option value="1080x1080">1:1 정사각 1080×1080</option><option value="1080x1920">9:16 스토리 1080×1920</option></select>
+  <select id="selFmt" style="width:auto" title="저장 형식"><option value="png">PNG</option><option value="jpg">JPG</option></select>
+  <button id="bPng">이 장 저장</button>
+  <button id="bExport" class="ic" title="작업 파일(.json) 내려받기">⤓ json</button><button id="bImport" class="ic" title="작업 파일(.json) 불러오기">⤒ json</button><input type="file" id="fImport" accept="application/json" hidden>
+ </div>
  <div class="msg">요소 <b>클릭 → 드래그</b> 이동(가운데·여백선에 자동 스냅), <b>더블클릭</b> 문구 수정, 손잡이로 폭·회전. <kbd>Del</kbd> 삭제 · <kbd>←↑↓→</kbd> 이동(<kbd>Shift</kbd> 10px) · <kbd>Ctrl+C/V</kbd> 복사·붙여넣기(다른 장에도) · <kbd>Ctrl+D</kbd> 복제 · <kbd>Ctrl+Z</kbd> 되돌리기 · <kbd>Esc</kbd> 선택 해제</div>
 </header>
 <main>
  <aside id="left"></aside>
  <div class="canvasWrap" id="wrap"><div id="stage"></div><div class="zoombar"><button id="zOut">−</button><span id="zLbl">100%</span><button id="zIn">＋</button><button id="zFit">맞춤</button></div></div>
- <aside class="right" id="right"></aside>
+ <aside class="right" id="rightWrap"><div class="sheetBar" id="sheetBar"><span id="sheetTitle">속성</span><button class="ic" id="sheetTog">▾</button></div><div id="right"></div></aside>
 </main>
 <div id="toast"></div>
 <div id="home" class="modal" hidden><div class="dlg">
@@ -160,23 +183,25 @@ function buildLayer(l,edit){
   return d;
 }
 /* ---------- left ---------- */
+function slideAction(a,i){const s=state.slides[i];
+  if(a==='up'){if(i===0)return;[state.slides[i-1],state.slides[i]]=[state.slides[i],state.slides[i-1]];cur=i-1;}
+  if(a==='dn'){if(i>=state.slides.length-1)return;[state.slides[i+1],state.slides[i]]=[state.slides[i],state.slides[i+1]];cur=i+1;}
+  if(a==='dup'){const c=clone(s);c.id='S'+uid();c.layers.forEach(l=>l.id=uid());state.slides.splice(i+1,0,c);cur=i+1;}
+  if(a==='del'){if(state.slides.length===1){toast('마지막 장은 삭제할 수 없어요');return;}if(!confirm(`${i+1}번 장을 삭제할까요?`))return;state.slides.splice(i,1);cur=Math.min(i,state.slides.length-1);}
+  selId=null;commit();renderAll();}
 function renderLeft(){
   const L=$('#left');L.innerHTML='';
   state.slides.forEach((s,i)=>{
     const t=document.createElement('div');t.className='thumb'+(i===cur?' sel':'');
     const pv=document.createElement('div');pv.className='pv';pv.style.aspectRatio=`${W()}/${H()}`;pv.appendChild(buildSlide(s,i,false));t.appendChild(pv);
     const tb=document.createElement('div');tb.className='tb';tb.innerHTML=`<span>${i+1}</span><span><button data-a="up" title="앞으로">↑</button><button data-a="dn" title="뒤로">↓</button><button data-a="dup" title="복제">⧉</button><button data-a="del" title="삭제" class="danger">✕</button></span>`;t.appendChild(tb);
-    t.onclick=e=>{const a=e.target.dataset.a;if(!a){cur=i;selId=null;renderAll();return;}
-      if(a==='up'&&i>0){[state.slides[i-1],state.slides[i]]=[state.slides[i],state.slides[i-1]];cur=i-1;}
-      if(a==='dn'&&i<state.slides.length-1){[state.slides[i+1],state.slides[i]]=[state.slides[i],state.slides[i+1]];cur=i+1;}
-      if(a==='dup'){const c=clone(s);c.id='S'+uid();c.layers.forEach(l=>l.id=uid());state.slides.splice(i+1,0,c);cur=i+1;}
-      if(a==='del'){if(state.slides.length===1){toast('마지막 장은 삭제할 수 없어요');return;}if(!confirm(`${i+1}번 장을 삭제할까요?`))return;state.slides.splice(i,1);cur=Math.min(i,state.slides.length-1);}
-      selId=null;commit();renderAll();};
+    t.onclick=e=>{const a=e.target.dataset.a;if(!a){cur=i;selId=null;renderAll();return;}slideAction(a,i);};
     L.appendChild(t);
   });
   const add=document.createElement('button');add.textContent='＋ 새 슬라이드';add.onclick=()=>{state.slides.push({id:'S'+uid(),photo:'',px:50,py:50,zoom:100,sh:55,shA:92,bg:'#14110E',pager:true,layers:[{...TXT(),html:'새 문구를 입력하세요',font:'display',size:84,weight:400,lh:1.05,y:Math.round(H()*.45)}]});cur=state.slides.length-1;selId=null;commit();renderAll();};
   L.appendChild(add);
   requestAnimationFrame(()=>L.querySelectorAll('.pv').forEach(pv=>{pv.firstChild.style.transform=`scale(${pv.clientWidth/W()})`;}));
+  if(isMobile()){const t=L.querySelector('.thumb.sel');t&&t.scrollIntoView({inline:'center',block:'nearest'});}
 }
 /* ---------- canvas ---------- */
 let scale=1;
@@ -190,6 +215,12 @@ function renderStage(){
   if(editingId){const el=st.querySelector(`.layer[data-id="${editingId}"] .tx`);if(el){el.contentEditable='true';el.parentElement.classList.add('editing');el.focus();}}
 }
 addEventListener('resize',()=>renderStage());
+const isMobile=()=>matchMedia('(max-width:900px)').matches;
+$('#bMore').onclick=e=>{e.stopPropagation();$('#more').classList.toggle('open');};
+addEventListener('pointerdown',e=>{if(!e.target.closest('#more,#bMore'))$('#more').classList.remove('open');});
+$('#more').addEventListener('click',e=>{if(e.target.tagName==='BUTTON')$('#more').classList.remove('open');});
+function sheet(open){const a=$('#rightWrap');a.classList.toggle('collapsed',!open);$('#sheetTog').textContent=open?'▾':'▴';if(isMobile())requestAnimationFrame(()=>{zoom=null;renderStage();});}
+$('#sheetBar').onclick=()=>sheet($('#rightWrap').classList.contains('collapsed'));
 $('#zIn').onclick=()=>{zoom=Math.min(2,(zoom||fitScale())+.1);renderStage();};
 $('#zOut').onclick=()=>{zoom=Math.max(.1,(zoom||fitScale())-.1);renderStage();};
 $('#zFit').onclick=()=>{zoom=null;renderStage();};
@@ -200,8 +231,8 @@ stage.addEventListener('pointerdown',e=>{
   const ly=e.target.closest('.layer');
   if(editingId){ if(ly&&ly.dataset.id===editingId) return; stopEdit(); }
   if(!ly){selId=null;renderStage();renderRight();return;}
-  const id=ly.dataset.id;if(selId!==id){selId=id;renderStage();renderRight();}
-  const l=sel();if(l.lock)return;
+  const id=ly.dataset.id;const wasSel=selId===id;if(!wasSel){selId=id;renderStage();renderRight();if(isMobile())sheet(true);}
+  const l=sel();if(l.lock)return;const ptype=e.pointerType;
   const cls=e.target.classList;const isW=cls.contains('hd')&&!cls.contains('rot'),isR=cls.contains('rot');
   const sx=e.clientX,sy=e.clientY,ox=l.x,oy=l.y,ow=l.w,oh=l.h||0,orot=l.rot||0;let moved=false;
   const el=stage.querySelector(`.layer[data-id="${id}"]`);const eh=el.offsetHeight;
@@ -215,7 +246,7 @@ stage.addEventListener('pointerdown',e=>{
       for(const [p,d,v] of ys)if(Math.abs(ny-p)<T){ny=Math.round(p);g.push({d,v});break;}}
       l.x=nx;l.y=ny;el.style.left=nx+'px';el.style.top=ny+'px';guides(g);}
     syncPos();};
-  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);guides([]);if(moved){commit();renderLeft();renderStage();}};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);guides([]);if(moved){commit();renderLeft();renderStage();}else if(ptype==='touch'&&wasSel&&l.type==='text'&&!isW&&!isR){editingId=id;renderStage();renderRight();}};
   addEventListener('pointermove',mv);addEventListener('pointerup',up);e.preventDefault();
 });
 stage.addEventListener('dblclick',e=>{const ly=e.target.closest('.layer.text');if(!ly)return;const l=slide().layers.find(x=>x.id===ly.dataset.id);if(l.lock)return;selId=l.id;editingId=selId;renderStage();renderRight();});
@@ -256,7 +287,7 @@ function colorField(label,key,akey){const o=sel()||slide();return `<div class="f
 function layerName(l){if(l.type==='text')return l.html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,22)||'(빈 글자)';if(l.type==='image')return '이미지';return l.h<=2?'구분선':'상자';}
 function layersPanel(){const s=slide();return `<div class="sec"><h3>레이어 <span style="font-weight:400;text-transform:none">${s.layers.length}개 · 위가 앞</span></h3>${[...s.layers].reverse().map(l=>`<div class="lyr ${l.id===selId?'sel':''}" data-id="${l.id}"><span class="t">${{text:'글자',box:'상자',image:'그림'}[l.type]}</span><span class="nm">${layerName(l)}</span><button data-t="hidden" class="${l.hidden?'off':''}" title="보기/숨기기">👁</button><button data-t="lock" class="${l.lock?'':'off'}" title="잠금">🔒</button></div>`).join('')||'<div class="empty">요소가 없습니다.</div>'}</div>`;}
 function renderRight(){
-  const R=$('#right');const l=sel();const s=slide();
+  const R=$('#right');const l=sel();const s=slide();$('#sheetTitle').textContent=l?({text:'글자',box:'상자',image:'이미지'}[l.type]+' 속성'):`슬라이드 ${cur+1} 속성`;
   const bindLayers=()=>{R.querySelectorAll('.lyr').forEach(row=>{row.onclick=e=>{const id=row.dataset.id;const t=e.target.dataset.t;const L=s.layers.find(x=>x.id===id);if(t){L[t]=!L[t];if(t==='lock'&&L.lock&&editingId===id)stopEdit();commit();renderAll();return;}selId=id;renderStage();renderRight();};});};
   if(!l){
     R.innerHTML=`<div class="sec"><h3>슬라이드 ${cur+1} / ${state.slides.length}</h3>
@@ -268,6 +299,7 @@ function renderRight(){
       ${field('어둡기 강도',`<input type="range" min="0" max="100" data-k="shA" value="${s.shA??92}">`)}
       ${colorField('배경색','bg')}
       ${field('페이지 점',`<div class="seg"><button data-k="pager" data-v="1" class="${s.pager?'on':''}">표시</button><button data-k="pager" data-v="0" class="${s.pager?'':'on'}">숨김</button></div>`)}
+      <div class="g4"><button data-sa="up">↑ 앞으로</button><button data-sa="dn">↓ 뒤로</button><button data-sa="dup">⧉ 복제</button><button data-sa="del" class="danger">✕ 삭제</button></div>
     </div>
     <div class="sec"><h3>요소 추가</h3><div class="g3"><button id="addH">제목</button><button id="addP">본문</button><button id="addTag">라벨(칩)</button></div><div class="g3"><button id="addImg">이미지·로고</button><button id="addBox">상자(카드)</button><button id="addLine">구분선</button></div></div>
     ${layersPanel()}
@@ -278,6 +310,7 @@ function renderRight(){
       if(sw){s[sw.parentElement.dataset.for]=sw.dataset.c;commit();renderAll();return;}
       if(!b||b.closest('.lyr'))return;
       if(b.dataset.k==='pager'){s.pager=b.dataset.v==='1';commit();renderAll();}
+      if(b.dataset.sa){slideAction(b.dataset.sa,cur);return;}
       if(b.id==='bPhoto')$('#fPhoto').click();
       if(b.id==='bNoPhoto'){s.photo='';commit();renderAll();}
       if(b.id==='bFont')$('#fFont').click();
