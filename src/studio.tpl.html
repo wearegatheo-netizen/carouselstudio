@@ -276,7 +276,7 @@ $('#bMore').onclick=e=>{e.stopPropagation();$('#more').classList.toggle('open');
 addEventListener('pointerdown',e=>{if(!e.target.closest('#more,#bMore'))$('#more').classList.remove('open');});
 $('#more').addEventListener('click',e=>{if(e.target.tagName==='BUTTON')$('#more').classList.remove('open');});
 function sheet(open){const a=$('#rightWrap');a.classList.toggle('collapsed',!open);$('#sheetTog').textContent=open?'▾':'▴';}
-$('#sheetBar').onclick=()=>sheet($('#rightWrap').classList.contains('collapsed'));
+$('#sheetBar').onclick=()=>{sheet($('#rightWrap').classList.contains('collapsed'));if(isMobile())requestAnimationFrame(()=>{zoom=null;fitCache=null;renderStage();});};
 $('#zIn').onclick=()=>{zoom=Math.min(2,(zoom||fitScale())+.1);renderStage();};
 $('#zOut').onclick=()=>{zoom=Math.max(.1,(zoom||fitScale())-.1);renderStage();};
 $('#zFit').onclick=()=>{zoom=null;fitCache=null;renderStage();};
