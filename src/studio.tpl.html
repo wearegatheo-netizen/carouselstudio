@@ -196,7 +196,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const uid=()=>'L'+Math.random().toString(36).slice(2,8);
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);}
-function fresh(key='classic'){const t=TEMPLATES[key]||TEMPLATES.classic;return {size:{w:1080,h:1350},slides:clone(t.slides).map(s=>({...s,id:'S'+uid(),layers:s.layers.map(l=>({...l,id:uid()}))})),fonts:[]};}
+function fresh(key='hybrid'){const t=TEMPLATES[key]||TEMPLATES.hybrid;return {size:{w:1080,h:1350},slides:clone(t.slides).map(s=>({...s,id:'S'+uid(),layers:s.layers.map(l=>({...l,id:uid()}))})),fonts:[]};}
 function save(){}
 function snap(){return JSON.stringify({slides:state.slides,size:state.size});}
 let commit=function(){hist=hist.slice(0,hptr+1);hist.push(snap());if(hist.length>100)hist.shift();hptr=hist.length-1;save();}
@@ -480,10 +480,10 @@ async function saveProject(auto){if(saving)return;saving=true;setStat('저장 �
 function useProject(code,title,data){fitCache=null;zoom=null;proj={code,title};state=data;state.size=state.size||{w:1080,h:1350};state.fonts=state.fonts||[];registerFonts();cur=0;selId=null;editingId=null;hist=[snap()];hptr=0;dirty=false;
   $('#pTitle').textContent=title;document.title=title+' · 캐러셀 스튜디오';setStat(code?'':'미저장');if(code){history.replaceState(null,'',`?p=${code}`);try{localStorage.setItem(KEY+':code',code);}catch(e){}}renderAll();}
 async function openProject(code,silent){try{const r=await store.get(code);if(!r){if(!silent)alert('프로젝트를 찾을 수 없습니다.');return false;}useProject(r.code,r.title,r.data);closeHome();toast(`"${r.title}" 열림`);return true;}catch(err){alert('불러오기 실패: '+(err.message||err));return false;}}
-function openTpl(){const L=$('#tlist');L.innerHTML=Object.entries(TEMPLATES).map(([k,t])=>`<div class="pc" data-k="${k}"><div class="th" style="background:#000"><div class="pv" style="width:100%;height:100%;position:relative;overflow:hidden"></div></div><div class="pb"><div class="pt">${esc(t.name)}</div><div class="pm">${esc(t.desc)} · ${t.slides.length}장</div></div></div>`).join('');
+function openTpl(){const L=$('#tlist');L.innerHTML=Object.entries(TEMPLATES).filter(([k,t])=>!t.hidden).map(([k,t])=>`<div class="pc" data-k="${k}"><div class="th" style="background:#000"><div class="pv" style="width:100%;height:100%;position:relative;overflow:hidden"></div></div><div class="pb"><div class="pt">${esc(t.name)}</div><div class="pm">${esc(t.desc)} · ${t.slides.length}장</div></div></div>`).join('');
   L.querySelectorAll('.pc').forEach(c=>{const t=TEMPLATES[c.dataset.k];const pv=c.querySelector('.pv');const saved=state;state={size:{w:1080,h:1350},slides:t.slides,fonts:[]};const el=buildSlide(t.slides[0],0,false);state=saved;el.style.position='absolute';el.style.transformOrigin='top left';pv.appendChild(el);requestAnimationFrame(()=>{el.style.transform=`scale(${pv.clientWidth/1080})`;});c.onclick=()=>{$('#tpl').hidden=true;newProject(c.dataset.k);};});$('#tpl').hidden=false;}
 async function newProject(fromTemplate){if(dirty&&!confirm('저장하지 않은 변경이 있습니다. 새 프로젝트를 만들까요?'))return;
-  const title=prompt('프로젝트 이름',fromTemplate?'게더 올 어라운드 팀 모집 · '+TEMPLATES[fromTemplate].name:'새 캐러셀');if(title===null)return;
+  const title=prompt('프로젝트 이름',fromTemplate?'게더 올 어라운드 팀 모집':'새 캐러셀');if(title===null)return;
   const data=fromTemplate?fresh(fromTemplate):{size:{w:1080,h:1350},fonts:[],slides:[{id:'S'+uid(),photo:'',px:50,py:50,zoom:100,sh:55,shA:92,bg:'#14110E',pager:true,layers:[]}]};
   useProject(null,title.trim()||'제목 없음',data);closeHome();await saveProject(true);toast('새 프로젝트 생성');}
 async function copyProject(code,title){try{const r=await store.get(code);if(!r)return;const c=newCode();const t=prompt('복사본 이름',title+' (복사본)');if(t===null)return;

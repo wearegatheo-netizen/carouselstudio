@@ -261,12 +261,12 @@ for s in classic:
     for l in s['layers']:
         if l['type'] == 'text': l['nowrap'] = '<br' not in l['html']; l['radius'] = 0 if (l['bgA'] == 0 and l['borderW'] == 0) else l['radius']
 out = {
-  'classic': {'name': '클래식 (현재 디자인)', 'desc': '사진 배경 + 카드·칩으로 정보를 묶은 기존 7장', 'slides': classic},
-  'minimal': {'name': '미니멀 다크', 'desc': '속지는 단색 배경, 카드 없이 글만 — 가장 깔끔', 'slides': minimal()},
-  'paper':   {'name': '화이트 페이퍼', 'desc': '밝은 종이 배경에 사진은 액자처럼, 타이포 중심', 'slides': paper()},
-  'poster':  {'name': '포스터', 'desc': '장마다 사진 한 장 + 큰 제목 한 줄, 정보 최소', 'slides': poster()},
-  'hybrid':  {'name': '다크 포스터', 'desc': '매 장 사진 + 큰 제목, 아래는 미니멀식 정돈된 목록', 'slides': hybrid()},
+  'hybrid':  {'name': '다크 포스터 (추천)', 'desc': '매 장 사진 + 큰 제목, 아래는 정돈된 목록 — 확정 시안', 'slides': hybrid()},
   'rhythm':  {'name': '다크 포스터 · 교차', 'desc': '표지·공간·혜택은 사진, 장비·시간·요금은 단색으로 교차', 'slides': hybrid(True)},
+  'classic': {'name': '클래식 (이전 디자인)', 'desc': '사진 배경 + 카드·칩으로 정보를 묶은 기존 7장', 'slides': classic},
+  'minimal': {'name': '미니멀 다크', 'desc': '속지는 단색 배경, 카드 없이 글만', 'slides': minimal(), 'hidden': True},
+  'paper':   {'name': '화이트 페이퍼', 'desc': '밝은 종이 배경에 사진은 액자처럼, 타이포 중심', 'slides': paper(), 'hidden': True},
+  'poster':  {'name': '포스터', 'desc': '장마다 사진 한 장 + 큰 제목 한 줄, 정보 최소', 'slides': poster(), 'hidden': True},
 }
 for k, v in out.items():
     if k != 'classic': apply_copy(v['slides'])
