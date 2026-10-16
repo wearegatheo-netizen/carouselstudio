@@ -20,10 +20,10 @@ const ev=(p,f)=>p.evaluate(f);
   // 선택/드래그/스냅
   const h=p.locator('#stage .layer.text').filter({hasText:'찾고 있어요'});await h.click();
   ok('D 클릭 선택',await ev(p,()=>!!sel()&&/찾고 있어요/.test(sel().html)));
-  let bb=await h.boundingBox();await p.mouse.move(bb.x+30,bb.y+20);await p.mouse.down();await p.mouse.move(bb.x+33,bb.y+20,{steps:2});await p.mouse.move(bb.x+30,bb.y-80,{steps:6});await p.mouse.up();
-  ok('D 드래그 이동',await ev(p,()=>sel().y<725));
-  ok('D 되돌리기',(await p.keyboard.press('Control+z'),await ev(p,()=>Math.round(sel()?.y??state.slides[0].layers.find(l=>/찾고 있어요/.test(l.html)).y)===725)));
-  ok('D 다시실행',(await p.keyboard.press('Control+y'),await ev(p,()=>state.slides[0].layers.find(l=>/찾고 있어요/.test(l.html)).y<725)));
+  const yh=await ev(p,()=>sel().y);let bb=await h.boundingBox();await p.mouse.move(bb.x+30,bb.y+20);await p.mouse.down();await p.mouse.move(bb.x+33,bb.y+20,{steps:2});await p.mouse.move(bb.x+30,bb.y-80,{steps:6});await p.mouse.up();
+  ok('D 드래그 이동',await ev(p,()=>sel().y)<yh);
+  ok('D 되돌리기',(await p.keyboard.press('Control+z'),Math.round(await ev(p,()=>state.slides[0].layers.find(l=>/찾고 있어요/.test(l.html)).y))===Math.round(yh)));
+  ok('D 다시실행',(await p.keyboard.press('Control+y'),await ev(p,()=>state.slides[0].layers.find(l=>/찾고 있어요/.test(l.html)).y)<yh));
   // 2px 이하 클릭은 이동 아님
   await h.click();bb=await h.boundingBox();const y1=await ev(p,()=>sel().y);await p.mouse.move(bb.x+30,bb.y+20);await p.mouse.down();await p.mouse.move(bb.x+31,bb.y+21);await p.mouse.up();
   ok('D 1px 클릭은 이동 없음',await ev(p,()=>sel().y)===y1);
