@@ -11,10 +11,10 @@
 | `supabase/migrations/20260922_carousel_projects_v2.sql` | 썸네일·장 수 컬럼, 삭제 정책 (프로젝트 목록용, **추가 실행 필요**) |
 | `_headers` | Cloudflare 응답 헤더 (dist/에 복사됨) |
 | `wrangler.jsonc` | Cloudflare Workers 정적 에셋 설정 (`dist/`) |
-| `src/` | 템플릿(`studio.tpl.html`)·레이아웃 JSON·기본 사진(`assets.json`)·꾸불림 4개 서브셋+unicode-range(`fonts.json`)·빌드 스크립트 |
+| `src/` | 앱 템플릿(`studio.tpl.html`)·시안 생성기(`gen_templates.py`→`templates.json`)·기본 사진(`assets.json`)·꾸불림 4개 서브셋+unicode-range(`fonts.json`)·빌드 스크립트 |
 
 ## 템플릿
-「＋ 템플릿으로 새 프로젝트」에서 선택: **다크 포스터(추천, 확정 시안)**, 다크 포스터·교차, 클래식(이전 디자인). 미니멀 다크·화이트 페이퍼·포스터는 `hidden`으로 숨겨 두었고 `src/gen_templates.py`에서 플래그만 지우면 다시 보입니다. 템플릿 좌표는 `src/gen_templates.py`(흐름 레이아웃)로 생성해 `src/templates.json`에 저장됩니다.
+「＋ 템플릿으로 새 프로젝트」는 확정 시안 **다크 포스터** 한 가지로 바로 프로젝트를 만듭니다. 좌표는 `src/gen_templates.py`(흐름 레이아웃)로 생성해 `src/templates.json`에 저장됩니다. 템플릿을 늘리려면 생성기의 `out`에 항목을 추가하면 선택 화면이 자동으로 다시 나타납니다.
 
 ## 글꼴
 기본 제공 글꼴 39종은 모두 무료·상업적 이용 가능한 SIL Open Font License입니다(배민 꾸불림 내장, 나머지는 Google Fonts·Pretendard CDN에서 선택 시 로드). 분류: 손글씨 · 제목 · 고딕 · 명조 · 장식 · 고정폭. 내 글꼴 파일(.ttf/.otf/.woff)도 프로젝트에 넣어 쓸 수 있습니다(파일의 라이선스는 직접 확인).
