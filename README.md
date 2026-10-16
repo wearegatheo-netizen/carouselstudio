@@ -12,7 +12,6 @@
 | `_headers` | Cloudflare 응답 헤더 (dist/에 복사됨) |
 | `wrangler.jsonc` | Cloudflare Workers 정적 에셋 설정 (`dist/`) |
 | `src/` | 템플릿(`studio.tpl.html`)·레이아웃 JSON·기본 사진(`assets.json`)·꾸불림 4개 서브셋+unicode-range(`fonts.json`)·빌드 스크립트 |
-| `.github/workflows/deploy-pages.yml` | (선택) wrangler로 Pages 배포 |
 
 ## 템플릿
 「＋ 템플릿으로 새 프로젝트」에서 4종 중 선택: 클래식(기존), 미니멀 다크, 화이트 페이퍼, 포스터. 템플릿 좌표는 `src/gen_templates.py`(흐름 레이아웃)로 생성해 `src/templates.json`에 저장됩니다.
@@ -35,13 +34,12 @@
 3. 설정이 비어 있거나 supabase-js 로드에 실패하면 클라우드 버튼만 비활성화되고 나머지는 정상 동작합니다.
 
 ## Cloudflare Pages 연결
-**방법 A — 대시보드에서 GitHub 연결(권장)**
+**대시보드에서 GitHub 연결**
 1. Cloudflare 대시보드 → Workers & Pages → Create → Pages → *Connect to Git* → `wearegatheo-netizen/carouselstudio` 선택.
 2. Production branch `master`, Build command **`npm run build`**, Deploy command **`npx wrangler deploy`** (Workers 방식, `wrangler.jsonc`가 `dist/`만 에셋으로 배포). Pages 방식이면 Build output directory를 **`dist`**로 지정.
 3. 배포 후 `https://carouselstudio.pages.dev` 로 접속. 필요하면 *Custom domains*에서 `studio.gatherallaround.com` 같은 서브도메인을 연결(DNS는 Cloudflare가 자동 추가).
 
-**방법 B — GitHub Actions(wrangler)**
-저장소 Settings → Secrets에 `CLOUDFLARE_API_TOKEN`(Cloudflare Pages: Edit 권한), `CLOUDFLARE_ACCOUNT_ID`를 등록하면 `master` push마다 `.github/workflows/deploy-pages.yml`이 배포합니다. Pages 프로젝트 `carouselstudio`가 먼저 존재해야 합니다(`wrangler pages project create carouselstudio`).
+**배포 흐름** `master`에 push하면 Cloudflare가 Git 연동으로 `npm run build` 후 `npx wrangler deploy`를 실행합니다(Workers 정적 에셋, `wrangler.jsonc`). GitHub Actions 워크플로는 Cloudflare 연동과 중복이라 제거했습니다.
 
 ## 개발
 ```bash
