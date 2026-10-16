@@ -161,6 +161,69 @@ def poster():
          page('@studio7.png', '06 · Rental', '공간 대관 · 최대 20명', '평일 <em>2.5만원</em><br>주말 <em>4만원</em> / 시간', ['5인 기준 · 인원 추가 1명당 +5,000원', 'gatherallaround.com/#perf · 010-5109-1042 · @gatherallaround'], py=20, size=104)]
     return S
 
+
+# ───────── D. 다크 포스터 (미니멀 다크 × 포스터) ─────────
+def hybrid(alternate=False):
+    P, M, A, BG = '#F7F2E8', '#B8AC98', '#FFC95C', '#100E0C'
+    def top(label): return [T(label, size=22, weight=500, color=M, ls=0.14, x=80, w=500), T(WM, font='display', size=28, color=P, align='right', x=580, w=420)]
+    def build(photo, label, eyebrow, title, rows, py=50, sh=40, size=104, solid=False):
+        f = Flow(72); f.row(*top(label))
+        items = [(T(eyebrow, size=24, weight=700, color=A, ls=0.14), 20), (T(title, font='display', size=size, color=P, lh=1.04, accent=A, shadow=not solid), 44)]
+        items += rows
+        f.bottom(items, bottom=130)
+        return slide('' if solid else photo, f.done(), py=py, sh=sh, shA=96, bg=BG)
+    def L(text, size=32, color=None, gap=14): return (T(text, size=size, weight=500, color=color or P, lh=1.4), gap)
+    def KV(k, v, gap=16, kw=170):  # 두 칸 행: 같은 y
+        a = T(k, size=24, weight=500, color=M, x=80, w=kw); b = T(v, size=29, weight=500, color=P, x=80 + kw + 10, w=920 - kw - 10, lh=1.4, nowrap=False, pad=0)
+        a['pad'] = 3; a['_h'] = b['_h']; return (a, b, gap)
+    def rows_kv(pairs):
+        out = []
+        for k, v, g in pairs: out.append(('ROW', k, v, g))
+        return out
+    S = []
+    # Flow.bottom은 (layer, gap)만 받으므로 두 칸 행은 수동 처리
+    def page(photo, label, eyebrow, title, body, py=50, sh=40, size=104, solid=False):
+        f = Flow(72); f.row(*top(label))
+        items = [(T(eyebrow, size=24, weight=700, color=A, ls=0.14), 20), (T(title, font='display', size=size, color=P, lh=1.04, accent=A, shadow=not solid), 44)]
+        flat = []
+        for it in body:
+            if it[0] == 'ROW':
+                _, k, v, g = it; a, b, g2 = KV(k, v, g); flat.append((a, g2)); flat.append((b, -(b['_h'] + g2) + g2 if False else g2)); 
+            else: flat.append(it)
+        # 두 칸 행: a와 b가 같은 y가 되도록 a의 높이를 0으로 두고 간격 0
+        fixed = []
+        i = 0
+        while i < len(flat):
+            l, g = flat[i]
+            if i + 1 < len(flat) and l['type'] == 'text' and l['x'] == 80 and flat[i+1][0]['x'] > 80 and l['w'] < 300 and flat[i+1][0]['type']=='text' and flat[i+1][0]['x']==80+l['w']+10:
+                l = dict(l); l['_h'] = 0; fixed.append((l, 0)); fixed.append(flat[i+1]); i += 2
+            else: fixed.append((l, g)); i += 1
+        if solid:
+            f.y = 300
+            for l, g in items + fixed:
+                if l.get('_h') == 0: l['y'] = f.y; f.items.append(l)   # 두 칸 행의 왼쪽 칸
+                else: f.add(l, g)
+        else: f.bottom(items + fixed, bottom=130)
+        return slide('' if solid else photo, f.done(), py=py, sh=sh, shA=96, bg=BG)
+    alt = lambda i: alternate and i in (2, 3, 4, 6)   # 교차형: 장비·시간·요금·대관은 단색
+    S.append(page('@studio1.jpg', 'Rehearsal · Space', 'GATHER ALL AROUND · 게더 올 어라운드', '같이 아끼고<br>같이 즐길<br><em>팀을 구합니다</em>',
+                  [L('합주실 · 소공연 · 모임 공간<br>월 고정팀 모집 · 시간 대관', gap=0)], sh=50, size=112))
+    S.append(page('@studio10.png', '01 · Space', '이런 공간이에요', '합주도, 소공연도,<br>뒷풀이 <em>보드게임</em>도',
+                  [L('110인치 빔스크린'), L('캠핑 테이블 2 · 의자 15'), L('싱크대 · 내부 화장실'), L('다양한 보드게임', gap=0)], py=30, sh=36))
+    S.append(page('@studio6.jpg', '02 · Gear', '기본 세팅', '몸만 오셔도<br>바로 <em>합주 시작</em>',
+                  rows_kv([(k, v, 14) for k, v in GEAR]), py=40, sh=30, solid=alt(2)))
+    S.append(page('@studio2.jpg', '03 · Time', '이용 가능 시간 · 2026.9.7 기준', '지금 비어 있는<br><em>타임</em>',
+                  rows_kv([(d, f'{t}  <small>{tag}</small>', 12) for d, t, tag in TIMES]) + [L('그 외 시간은 gatherallaround.com/#perf 에서 확인', size=24, color=M, gap=0)], sh=30, solid=alt(3)))
+    S.append(page('@studio5.jpg', '04 · Monthly', '월 고정팀', '4주 <em>20만원</em>',
+                  [L('5인 팀 · 주 1회 1타임 · 공휴일 상관없이 4주'), L('2타임 사용 시 4주 30만원'), L('인원 추가 시 1명당 +5만원', gap=0)], sh=58, solid=alt(4)))
+    S.append(page('@studio8.png', '05 · Benefits', '★ 고정팀 혜택', '공간 이상의 것을<br><em>함께</em> 나눠요',
+                  [L(f'<em>{i}</em>&nbsp;&nbsp;{t}') for i, t in enumerate(BENE, 1)][:-1] + [L(f'<em>4</em>&nbsp;&nbsp;{BENE[3]}', gap=0)], py=30, sh=42))
+    S.append(page('@studio7.png', '06 · Rental', '공간 대관 · 시간 단위 · 최대 20명', '평일 <em>2.5만원</em><br>주말 <em>4만원</em> / 시간',
+                  [L('5인 기준 · 인원 추가 1명당 +5,000원 · 표에 없는 시간도 대관 가능', size=26, color=M, gap=28),
+                   (T('gatherallaround.com/#perf', font='display', size=56, color=A, lh=1.1), 16),
+                   (T('010-5109-1042 · @gatherallaround', size=28, weight=700, color=P), 0)], py=20, sh=48, size=96, solid=alt(6)))
+    return S
+
 classic = json.load(open('template.json'))
 for s in classic:
     for l in s['layers']:
@@ -170,6 +233,8 @@ out = {
   'minimal': {'name': '미니멀 다크', 'desc': '속지는 단색 배경, 카드 없이 글만 — 가장 깔끔', 'slides': minimal()},
   'paper':   {'name': '화이트 페이퍼', 'desc': '밝은 종이 배경에 사진은 액자처럼, 타이포 중심', 'slides': paper()},
   'poster':  {'name': '포스터', 'desc': '장마다 사진 한 장 + 큰 제목 한 줄, 정보 최소', 'slides': poster()},
+  'hybrid':  {'name': '다크 포스터', 'desc': '매 장 사진 + 큰 제목, 아래는 미니멀식 정돈된 목록', 'slides': hybrid()},
+  'rhythm':  {'name': '다크 포스터 · 교차', 'desc': '표지·공간·혜택은 사진, 장비·시간·요금은 단색으로 교차', 'slides': hybrid(True)},
 }
 json.dump(out, open('templates.json', 'w'), ensure_ascii=False)
 print({k: len(v['slides']) for k, v in out.items()})
