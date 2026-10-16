@@ -36,8 +36,9 @@ def slide(photo, layers, px=50, py=50, sh=60, shA=92, bg='#14110E', pager=True, 
     return dict(id='S' + uid(), photo=photo, px=px, py=py, zoom=zoom, sh=sh, shA=shA, bg=bg, pager=pager, layers=layers)
 
 WM = 'Gather all around'
-GEAR = [('마이크', 'Sennheiser e845s ×2'), ('키보드', 'Yamaha S90'), ('드럼', 'Mapex Mars + Yamaha RC 스네어'), ('믹서', 'Behringer XR-18'), ('스피커', 'Yamaha DBR15'), ('앰프', 'Blackstar HT Soloist 60 · Fender Champion 100 · Fender Rumble 500')]
+GEAR = [('기타·베이스', '본인 악기 지참 · 앰프는 있어요'), ('마이크', 'Sennheiser e845s ×2'), ('키보드', 'Yamaha S90'), ('드럼', 'Mapex Mars + Yamaha RC 스네어'), ('믹서', 'Behringer XR-18'), ('스피커', 'Yamaha DBR15'), ('앰프', 'Blackstar HT Soloist 60 · Fender Champion 100 · Fender Rumble 500')]
 TIMES = [('월', '18:00 – 23:00', '고정팀 · 대관'), ('목', '18:00 – 23:00', '11/5부터 가능'), ('토', '09:00 – 14:00', '고정팀 · 대관'), ('토', '14:00 – 23:00', '대관만'), ('일', '09:00 – 14:00', '고정팀 · 대관'), ('일', '14:00 – 18:00', '고정팀 · 대관')]
+INQ = ['요일·시간대별로 상황이 자주 바뀌어요', '원하는 요일과 시간을 알려주시면 바로 확인해 드릴게요', '문의 010-5109-1042 · 인스타 DM @gatherallaround']
 BENE = ['내부 노트북 FL Studio 사용', '월 1회 평일 남는 시간 추가 사용', '이용 팀들과 교류 · 연합공연', '캐비넷 제공 (6개월 이상)']
 
 # ───────── A. 미니멀 다크 ─────────
@@ -68,15 +69,16 @@ def minimal():
         f.row(T(k, size=26, weight=500, color=M, x=80, w=180), T(v, size=28, weight=500, color=P, x=270, w=730, lh=1.4, nowrap=False), gap=22)
     S.append(slide('', f.done(), bg=BG))
     # 4 time
-    f = Flow(72); f.row(*top('03 · Time')); head(f, '이용 가능 시간 · 2026.9.7 기준', '지금 비어 있는<br><em>타임</em>')
-    for d, t, tag in TIMES:
-        f.row(T(d, font='display', size=40, color=A, x=80, w=90), T(t, size=32, weight=500, color=P, x=190, w=420), T(tag, size=24, weight=500, color=M, align='right', x=600, w=400), gap=20)
-    f.bottom([(T('화·수·금·일 저녁은 마감<br>그 외 시간 대관은 gatherallaround.com/#perf', size=24, color=M, lh=1.5), 0)], bottom=130)
+    f = Flow(72); f.row(*top('03 · Time')); head(f, '이용 가능 시간 · 문의 주세요', '비는 시간은<br>그때그때 <em>달라요</em>')
+    for t in INQ: f.add(T(t, size=32, weight=500, color=P, lh=1.4, nowrap=False), 18)
+    f.bottom([(T('대관 가능 시간은 gatherallaround.com/#perf 에서도 확인할 수 있어요', size=24, color=M), 0)], bottom=130)
     S.append(slide('', f.done(), bg=BG))
     # 5 monthly
-    f = Flow(72); f.row(*top('04 · Monthly')); head(f, '월 고정팀', '주 1회, 4주 동안<br>우리 팀 <em>고정 타임</em>')
-    f.row(T('20', font='display', size=150, color=A, x=80, w=260, lh=1.0), T('만원 / 4주', size=36, weight=700, color=P, x=330, w=400, lh=1.0, pad=96), gap=28)
-    for t in ['5인 팀 · 1타임(주 1회) · 공휴일 상관없이 4주', '2타임 사용 시 4주 30만원', '인원 추가 시 1명당 +5만원']:
+    f = Flow(72); f.row(*top('04 · Monthly')); head(f, '월 고정팀 · 4주 기준 · 5인 팀', '매주 한 번,<br>우리 팀 <em>고정 시간</em>')
+    f.row(T('주 1회', size=26, weight=700, color=M, x=80, w=400), T('주 2회', size=26, weight=700, color=M, x=560, w=400), gap=6)
+    f.row(T('20', font='display', size=120, color=A, x=80, w=200, lh=1.0), T('만원', size=34, weight=700, color=P, x=270, w=200, lh=1.0, pad=76),
+          T('30', font='display', size=120, color=A, x=560, w=200, lh=1.0), T('만원', size=34, weight=700, color=P, x=750, w=200, lh=1.0, pad=76), gap=30)
+    for t in ['한 타임 = 주 1회 고정 시간, 4주 동안 보장', '공휴일 상관없이 4주 · 인원 추가 시 1명당 +5만원']:
         f.add(T(t, size=30, color='#E8DFCF'), 16)
     S.append(slide('', f.done(), bg=BG))
     # 6 benefits
@@ -89,7 +91,7 @@ def minimal():
     f.row(T('평일', size=24, color=M, x=80, w=200), T('주말', size=24, color=M, x=540, w=200), gap=8)
     f.row(T('2.5', font='display', size=96, color=A, x=80, w=200, lh=1.0), T('만원 / 시간', size=28, weight=700, color=P, x=290, w=240, pad=56, lh=1.0),
           T('4', font='display', size=96, color=A, x=540, w=120, lh=1.0), T('만원 / 시간', size=28, weight=700, color=P, x=680, w=300, pad=56, lh=1.0), gap=16)
-    f.add(T('5인 기준 · 인원 추가 1명당 +5,000원 · 표에 없는 시간도 대관 가능', size=24, color=M), 0)
+    f.add(T('5인 기준 · 인원 추가 1명당 +5,000원 · 원하는 시간은 문의 주세요', size=24, color=M), 0)
     f.bottom([(T('예약 · 문의', size=24, weight=700, color=A, ls=0.12), 16),
               (T('gatherallaround.com/#perf', font='display', size=56, color='#FFD27A', lh=1.1), 20),
               (T('010-5109-1042 · @gatherallaround', size=28, weight=700, color=P), 0)], bottom=130)
@@ -119,14 +121,15 @@ def paper():
     for k, v in GEAR:
         f.row(T(k, size=24, weight=700, color=M, x=80, w=180), T(v, size=28, weight=500, color=INK, x=270, w=730, lh=1.4, nowrap=False), gap=12); f.add(Line(INK, 10), 14)
     S.append(slide('', f.done(), bg=BG))
-    f = Flow(72); f.row(*top('03 · Time')); head(f, '이용 가능 시간 · 2026.9.7 기준', '지금 비어 있는 <em>타임</em>', 330)
-    for d, t, tag in TIMES:
-        f.row(T(d, font='display', size=38, color=A, x=80, w=90), T(t, size=32, weight=500, color=INK, x=190, w=420), T(tag, size=24, weight=500, color=M, align='right', x=600, w=400), gap=10); f.add(Line(INK, 10), 14)
-    f.add(T('표에 없는 시간 대관은 gatherallaround.com/#perf 에서 확인', size=24, color=M), 0)
+    f = Flow(72); f.row(*top('03 · Time')); head(f, '이용 가능 시간 · 문의 주세요', '비는 시간은<br>그때그때 <em>달라요</em>', 330)
+    for t in INQ: f.add(T(t, size=32, weight=500, color=INK, lh=1.4, nowrap=False), 10); f.add(Line(INK, 12), 16)
+    f.add(T('대관 가능 시간은 gatherallaround.com/#perf 에서도 확인할 수 있어요', size=24, color=M), 0)
     S.append(slide('', f.done(), bg=BG))
-    f = Flow(72); f.row(*top('04 · Monthly')); head(f, '월 고정팀', '주 1회, 4주 동안<br>우리 팀 <em>고정 타임</em>', 330)
-    f.row(T('20', font='display', size=150, color=A, x=80, w=260, lh=1.0), T('만원 / 4주', size=36, weight=700, color=INK, x=330, w=400, lh=1.0, pad=96), gap=24)
-    for t in ['5인 팀 · 1타임(주 1회) · 공휴일 상관없이 4주', '2타임 사용 시 4주 30만원', '인원 추가 시 1명당 +5만원']:
+    f = Flow(72); f.row(*top('04 · Monthly')); head(f, '월 고정팀 · 4주 기준 · 5인 팀', '매주 한 번,<br>우리 팀 <em>고정 시간</em>', 330)
+    f.row(T('주 1회', size=26, weight=700, color=M, x=80, w=400), T('주 2회', size=26, weight=700, color=M, x=560, w=400), gap=6)
+    f.row(T('20', font='display', size=120, color=A, x=80, w=200, lh=1.0), T('만원', size=34, weight=700, color=INK, x=270, w=200, lh=1.0, pad=76),
+          T('30', font='display', size=120, color=A, x=560, w=200, lh=1.0), T('만원', size=34, weight=700, color=INK, x=750, w=200, lh=1.0, pad=76), gap=26)
+    for t in ['한 타임 = 주 1회 고정 시간, 4주 동안 보장', '공휴일 상관없이 4주 · 인원 추가 시 1명당 +5만원']:
         f.add(T(t, size=30, color=INK), 14)
     S.append(slide('', f.done(), bg=BG))
     f = Flow(72); f.row(*top('05 · Benefits')); head(f, '고정팀 혜택', '공간 이상의 것을<br><em>함께</em> 나눠요', 330)
@@ -154,9 +157,9 @@ def poster():
         f.bottom(items, bottom=130); return slide(photo, f.done(), py=py, sh=sh)
     S = [page('@studio1.jpg', 'Rehearsal · Space', 'GATHER ALL AROUND', '같이 아끼고<br>같이 즐길<br><em>팀을 구합니다</em>', ['합주실 · 소공연 · 모임 공간 · 월 고정팀 모집 · 시간 대관'], sh=62),
          page('@studio10.png', '01 · Space', '이런 공간이에요', '합주도 소공연도<br><em>보드게임</em>도', ['110인치 빔스크린 · 테이블 2 · 의자 15', '싱크대 · 내부 화장실 · 다양한 보드게임'], py=30),
-         page('@studio6.jpg', '02 · Gear', '기본 세팅', '몸만 오셔도<br><em>바로 합주</em>', ['Sennheiser e845s ×2 · Yamaha S90 · Mapex Mars', 'Behringer XR-18 · Yamaha DBR15', 'Blackstar HT Soloist 60 · Fender Champion 100 · Rumble 500'], py=40, line_size=28),
-         page('@studio2.jpg', '03 · Time', '이용 가능 시간 · 2026.9.7 기준', '지금 비어 있는<br><em>타임</em>', ['월 18–23 · 목 18–23 (11/5부터)', '토 09–14 · 일 09–14 · 일 14–18', '토 14–23은 대관만 · 그 외는 gatherallaround.com/#perf'], line_size=28),
-         page('@studio5.jpg', '04 · Monthly', '월 고정팀', '4주 <em>20만원</em>', ['5인 팀 · 주 1회 · 공휴일 상관없이 4주', '2타임 30만원 · 인원 추가 1명당 +5만원']),
+         page('@studio6.jpg', '02 · Gear', '기본 세팅', '몸만 오셔도<br><em>바로 합주</em>', ['기타·베이스는 본인 악기 지참 · 앰프는 있어요', 'Sennheiser e845s ×2 · Yamaha S90 · Mapex Mars · XR-18 · DBR15', 'Blackstar HT Soloist 60 · Fender Champion 100 · Rumble 500'], py=40, line_size=28),
+         page('@studio2.jpg', '03 · Time', '이용 가능 시간 · 문의 주세요', '비는 시간은<br>그때그때 <em>달라요</em>', INQ, line_size=28),
+         page('@studio5.jpg', '04 · Monthly', '월 고정팀 · 4주 기준 · 5인 팀', '주 1회 <em>20만원</em><br>주 2회 <em>30만원</em>', ['한 타임 = 주 1회 고정 시간 · 공휴일 상관없이 4주 보장', '인원 추가 시 1명당 +5만원']),
          page('@studio8.png', '05 · Benefits', '고정팀 혜택', '공간 이상의 것을<br><em>함께</em>', ['FL Studio 사용 · 월 1회 평일 추가 사용', '팀 교류 · 연합공연 · 캐비넷(6개월 이상)'], py=30),
          page('@studio7.png', '06 · Rental', '공간 대관 · 최대 20명', '평일 <em>2.5만원</em><br>주말 <em>4만원</em> / 시간', ['5인 기준 · 인원 추가 1명당 +5,000원', 'gatherallaround.com/#perf · 010-5109-1042 · @gatherallaround'], py=20, size=104)]
     return S
@@ -212,14 +215,14 @@ def hybrid(alternate=False):
                   [L('110인치 빔스크린'), L('캠핑 테이블 2 · 의자 15'), L('싱크대 · 내부 화장실'), L('다양한 보드게임', gap=0)], py=30, sh=36))
     S.append(page('@studio6.jpg', '02 · Gear', '기본 세팅', '몸만 오셔도<br>바로 <em>합주 시작</em>',
                   rows_kv([(k, v, 14) for k, v in GEAR]), py=40, sh=30, solid=alt(2)))
-    S.append(page('@studio2.jpg', '03 · Time', '이용 가능 시간 · 2026.9.7 기준', '지금 비어 있는<br><em>타임</em>',
-                  rows_kv([(d, f'{t}  <small>{tag}</small>', 12) for d, t, tag in TIMES]) + [L('그 외 시간은 gatherallaround.com/#perf 에서 확인', size=24, color=M, gap=0)], sh=30, solid=alt(3)))
-    S.append(page('@studio5.jpg', '04 · Monthly', '월 고정팀', '4주 <em>20만원</em>',
-                  [L('5인 팀 · 주 1회 1타임 · 공휴일 상관없이 4주'), L('2타임 사용 시 4주 30만원'), L('인원 추가 시 1명당 +5만원', gap=0)], sh=58, solid=alt(4)))
+    S.append(page('@studio2.jpg', '03 · Time', '이용 가능 시간 · 문의 주세요', '비는 시간은<br>그때그때 <em>달라요</em>',
+                  [L(t) for t in INQ] + [L('대관 가능 시간은 gatherallaround.com/#perf 에서도 확인', size=24, color=M, gap=0)], sh=36, solid=alt(3)))
+    S.append(page('@studio5.jpg', '04 · Monthly', '월 고정팀 · 4주 기준 · 5인 팀', '주 1회 <em>20만원</em><br>주 2회 <em>30만원</em>',
+                  [L('한 타임 = 주 1회 고정 시간, 4주 동안 보장'), L('공휴일 상관없이 4주 · 인원 추가 시 1명당 +5만원', gap=0)], sh=52, solid=alt(4)))
     S.append(page('@studio8.png', '05 · Benefits', '★ 고정팀 혜택', '공간 이상의 것을<br><em>함께</em> 나눠요',
                   [L(f'<em>{i}</em>&nbsp;&nbsp;{t}') for i, t in enumerate(BENE, 1)][:-1] + [L(f'<em>4</em>&nbsp;&nbsp;{BENE[3]}', gap=0)], py=30, sh=42))
     S.append(page('@studio7.png', '06 · Rental', '공간 대관 · 시간 단위 · 최대 20명', '평일 <em>2.5만원</em><br>주말 <em>4만원</em> / 시간',
-                  [L('5인 기준 · 인원 추가 1명당 +5,000원 · 표에 없는 시간도 대관 가능', size=26, color=M, gap=28),
+                  [L('5인 기준 · 인원 추가 1명당 +5,000원 · 원하는 시간은 문의 주세요', size=26, color=M, gap=28),
                    (T('gatherallaround.com/#perf', font='display', size=56, color=A, lh=1.1), 16),
                    (T('010-5109-1042 · @gatherallaround', size=28, weight=700, color=P), 0)], py=20, sh=48, size=96, solid=alt(6)))
     return S
@@ -235,15 +238,9 @@ COPY = {
  '합주도, 소공연도,<br>뒷풀이 <em>보드게임</em>도': '합주도 공연도,<br>끝나면 <em>보드게임</em>',
  '합주도 소공연도<br><em>보드게임</em>도': '합주도 공연도,<br>끝나면 <em>보드게임</em>',
  '합주도, 소공연도,<br>뒷풀이 보드게임도': '합주도 공연도,<br>끝나면 보드게임까지',
- '기본 세팅': '기본 장비 · 추가 비용 없음',
- '몸만 오셔도<br>바로 <em>합주 시작</em>': '악기는 다 있으니<br><em>몸만 오세요</em>',
- '몸만 오셔도<br><em>바로 합주</em>': '악기는 다 있어요,<br><em>몸만 오세요</em>',
- '이용 가능 시간 · 2026.9.7 기준': '비어 있는 시간 · 2026.9.7 기준',
- '지금 비어 있는<br><em>타임</em>': '이 시간은<br><em>비어 있어요</em>',
- '지금 비어 있는 <em>타임</em>': '이 시간은 <em>비어 있어요</em>',
- '월 고정팀': '월 고정팀 · 주 1회 · 5인 기준',
- '4주 <em>20만원</em>': '4주에 <em>20만원</em>',
- '주 1회, 4주 동안<br>우리 팀 <em>고정 타임</em>': '매주 한 번,<br>우리 팀 <em>고정 시간</em>',
+ '기본 세팅': '기본 장비 제공 · 기타·베이스는 지참',
+ '몸만 오셔도<br>바로 <em>합주 시작</em>': '앰프·드럼은 있어요,<br><em>기타·베이스</em>만 챙겨요',
+ '몸만 오셔도<br><em>바로 합주</em>': '앰프·드럼은 있어요,<br><em>기타·베이스</em>만 챙겨요',
  '★ 고정팀 혜택': '★ 고정팀만의 혜택', '고정팀 혜택': '★ 고정팀만의 혜택',
  '공간 이상의 것을<br><em>함께</em> 나눠요': '고정팀이 되면<br>이런 게 <em>따라와요</em>',
  '공간 이상의 것을<br><em>함께</em>': '고정팀이 되면<br>이런 게 <em>따라와요</em>',
