@@ -138,3 +138,96 @@ out = {
 for k, v in out.items(): apply_copy(v['slides'])
 json.dump(out, open('templates.json', 'w'), ensure_ascii=False)
 print({k: len(v['slides']) for k, v in out.items()})
+
+# ───────── 라이브 플라이어 (밝은 종이 · 코발트 블루 · 노랑 형광 · 검은고딕) ─────────
+def flyer():
+    CREAM, INK, BLUE, YEL, MUT, WH = '#F3EEE4', '#151515', '#2B55D6', '#FFD23F', '#6F6A60', '#FFFFFF'
+    def H(html, size=92, color=INK, lh=1.05, **kw):  # 검은고딕 제목
+        return T(html, font='blackhan', size=size, weight=400, color=color, lh=lh, accent=BLUE, **kw)
+    def num(n): return H(n, size=150, color=BLUE, x=80, w=400, lh=1.0, y=72)
+    def wm(color=INK): return T(WM, font='display', size=28, color=color, align='right', x=580, w=420, y=96)
+    def box(x, y, w, h, fill, radius=28, a=100): b = Line(fill, a, x=x, w=w, h=h); b['y'] = y; b['radius'] = radius; return b
+    def put(l, y, x=None):
+        l['y'] = y
+        if x is not None: l['x'] = x
+        return l
+    def tag(html, x, y, w=300, rot=-7, size=32):  # 기울어진 노란 라벨
+        return put(T(html, font='blackhan', size=size, weight=400, color=INK, align='center', x=x, w=w, bg=YEL, bgA=100, radius=999, pad=14, padX=24, rot=rot, lh=1.0), y)
+    def strip(y, html):  # 노란 형광 줄 + 글자
+        return [box(80, y, 920, 56, YEL, radius=10), put(T(html, size=32, weight=700, color=INK, x=96, w=888, lh=1.0, pad=12), y)]
+    S = []
+    # 1 표지
+    L = [box(0, 0, 1080, 790, BLUE, radius=0)]
+    L += [put(T(WM, font='display', size=28, color=WH, x=80, w=500), 40), put(T('합주실 · 소공연 · 모임 공간', size=24, weight=700, color=YEL, align='right', x=580, w=420, ls=0.06), 42)]
+    im = Img('@studio1.jpg', 80, 920, 600, radius=28); im['y'] = 100; im['border'] = WH; im['borderA'] = 100; im['borderW'] = 8; L.append(im)
+    L.append(tag('팀 모집 중!', 640, 650, w=320, rot=-8, size=36))
+    L.append(put(H('같이 쓸 팀<br><em>찾고 있어요</em>', size=120), 850))
+    L.append(put(T('월 고정팀 모집 · 시간 단위 대관', size=34, weight=700, color=INK), 1130))
+    L.append(put(T('gatherallaround.com', size=24, weight=500, color=MUT), 1250))
+    S.append(slide('', L, bg=CREAM))
+    # 2 공간
+    L = [num('01'), wm(), put(H('합주도 공연도,<br>끝나면 <em>보드게임</em>'), 250)]
+    im = Img('@studio10.png', 80, 920, 380, radius=24); im['y'] = 480; L.append(im)
+    L += strip(900, '110인치 빔스크린 · 캠핑 테이블 2 · 의자 15') + strip(972, '싱크대 · 내부 화장실 · 다양한 보드게임')
+    L.append(put(T('다양한 팀들과 교류하고 연합공연도 함께 열어요', size=28, weight=500, color=MUT), 1070))
+    S.append(slide('', L, bg=CREAM))
+    # 3 장비
+    L = [num('02'), wm(), put(H('앰프·드럼은 있어요,<br><em>기타·베이스</em>만 챙겨요'), 250)]
+    L.append(box(80, 480, 920, 580, BLUE))
+    y = 522
+    for k, v in GEAR:
+        L.append(put(T(k, size=24, weight=700, color=YEL, x=120, w=190, lh=1.3), y + 4))
+        L.append(put(T(v, size=28, weight=500, color=WH, x=320, w=650, lh=1.35), y))
+        y += 66 + (38 if '<br>' in v else 0)
+    L.append(put(T('고정팀은 캐비넷에 악기를 두고 다닐 수 있어요 (6개월 이상)', size=26, weight=500, color=MUT), 1100))
+    S.append(slide('', L, bg=CREAM))
+    # 4 시간 문의
+    L = [num('03'), wm(), put(H('비는 시간은<br>그때그때 <em>달라요</em>'), 250)]
+    L.append(box(80, 480, 920, 440, YEL))
+    L.append(put(H('원하는 요일·시간을<br>알려주시면 바로 확인!', size=56, lh=1.2, x=130, w=820), 530))
+    L.append(put(T('요일·시간대별로 상황이 자주 바뀌어요', size=30, weight=500, color=INK, x=130, w=820), 700))
+    L.append(put(T('문의 010-5109-1042 · 인스타 DM @gatherallaround', size=30, weight=700, color=INK, x=130, w=820), 752))
+    L.append(put(T('대관 가능 시간은 gatherallaround.com/#perf 에서도 확인', size=24, weight=500, color='#5A5546', x=130, w=820), 820))
+    im = Img('@studio2.jpg', 80, 920, 270, radius=24); im['y'] = 970; L.append(im)
+    S.append(slide('', L, bg=CREAM))
+    # 5 고정팀
+    L = [num('04'), wm(), put(H('매주 한 번,<br>우리 팀 <em>고정 시간</em>'), 250)]
+    for i, (x, fill, lab, price) in enumerate([(80, BLUE, '주 1회', '20만원'), (550, INK, '주 2회', '30만원')]):
+        L.append(box(x, 500, 450, 300, fill))
+        L.append(put(T(lab, size=28, weight=700, color=YEL, x=x + 40, w=370), 540))
+        L.append(put(H(price, size=96, color=WH, x=x + 40, w=390, lh=1.0), 596))
+        L.append(put(T('4주 · 5인 팀 기준', size=24, weight=500, color=WH, x=x + 40, w=370), 730))
+    L.append(tag('2타임이면 10만원 아껴요', 580, 456, w=440, rot=-5, size=28))
+    L.append(put(T('한 타임 = 주 1회 고정 시간, 4주 동안 보장', size=30, weight=500, color=INK), 850))
+    L.append(put(T('공휴일 상관없이 4주 · 인원 추가 시 1명당 +5만원', size=30, weight=500, color=INK), 900))
+    L.append(put(T('고정팀 혜택은 다음 장에서 →', size=26, weight=500, color=MUT), 1250))
+    S.append(slide('', L, bg=CREAM))
+    # 6 혜택
+    L = [num('05'), wm(), put(H('고정팀이 되면<br>이런 게 <em>따라와요</em>'), 250)]
+    y = 500
+    for i, t in enumerate(BENE, 1):
+        L.append(box(80, y, 64, 64, BLUE, radius=999))
+        L.append(put(H(str(i), size=34, color=WH, x=80, w=64, lh=1.0, align='center', pad=15), y))
+        L.append(put(T(t, size=34, weight=700, color=INK, x=170, w=830, lh=1.0, pad=14), y))
+        y += 104
+    im = Img('@studio8.png', 80, 920, 300, radius=24); im['y'] = 940; L.append(im)
+    S.append(slide('', L, bg=CREAM))
+    # 7 대관 + 문의
+    L = [num('06'), wm(), put(H('하루만 써도 좋아요<br>평일 <em>2.5만</em> · 주말 <em>4만</em>'), 250)]
+    L.append(put(T('시간 단위 대관 · 5인 기준 · 최대 20명 · 인원 추가 1명당 +5,000원', size=26, weight=500, color=MUT), 470))
+    L.append(box(80, 540, 920, 500, BLUE))
+    L.append(put(T('예약 · 문의', size=24, weight=700, color=YEL, x=130, w=820, ls=0.08), 586))
+    L.append(put(H('gatherallaround.com/#perf', size=46, color=WH, x=130, w=820, lh=1.0), 632))
+    L.append(put(H('010-5109-1042', size=58, color=WH, x=130, w=820, lh=1.0), 700))
+    L.append(put(T('인스타그램 @gatherallaround · DM 환영', size=30, weight=700, color=WH, x=130, w=820), 810))
+    L.append(put(T('원하는 시간을 알려주시면 바로 확인해 드려요', size=28, weight=500, color='#DCE4FF', x=130, w=820), 866))
+    L.append(tag('하루만 써도 좋아요', 600, 1004, w=380, rot=6, size=30))
+    L.append(put(T(WM, font='display', size=30, color=INK, x=80, w=500), 1240))
+    S.append(slide('', L, bg=CREAM))
+    for s in S:
+        for l in s['layers']: l.pop('_h', None)
+    return S
+
+out['flyer'] = {'name': '라이브 플라이어', 'desc': '밝은 종이 · 코발트 블루 색면 · 노란 형광 강조 · 검은고딕 제목', 'slides': apply_copy(flyer())}
+json.dump(out, open('templates.json', 'w'), ensure_ascii=False)
+print({k: len(v['slides']) for k, v in out.items()})

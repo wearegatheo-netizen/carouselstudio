@@ -12,7 +12,7 @@ const ev=(p,f)=>p.evaluate(f);
 /* ---------------- desktop ---------------- */
 { const {ctx,p,errs}=await mk(false);
   ok('D 초기: 프로젝트 모달 표시',await ev(p,()=>!$('#home').hidden));
-  await p.click('#hNewT');await p.waitForTimeout(1300);
+  await p.click('#hNewT');await p.waitForTimeout(300);await p.click('#tlist .pc[data-k=hybrid]');await p.waitForTimeout(1300);
   ok('D 새 프로젝트: 코드·제목·저장',await ev(p,()=>!!proj.code&&proj.title==='QA'&&/저장됨/.test($('#saveStat').textContent)));
   ok('D 템플릿 7장',await ev(p,()=>state.slides.length===7));
   // 폰트 4 서브셋
@@ -91,7 +91,7 @@ const ev=(p,f)=>p.evaluate(f);
   await ctx.close();}
 /* ---------------- mobile ---------------- */
 { const {ctx,p,errs}=await mk(true);
-  await p.tap('#hNewT');await p.waitForTimeout(1200);
+  await p.tap('#hNewT');await p.waitForTimeout(300);await p.tap('#tlist .pc[data-k=hybrid]');await p.waitForTimeout(1200);
   const rect=async()=>{const r=await p.locator('#stage').boundingBox();return [Math.round(r.x),Math.round(r.y),Math.round(r.width)];};
   const r0=await rect();
   const lead=p.locator('#stage .layer.text').filter({hasText:'월 고정팀 모집'});
