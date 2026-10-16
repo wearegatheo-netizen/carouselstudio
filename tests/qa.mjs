@@ -73,14 +73,14 @@ const ev=(p,f)=>p.evaluate(f);
   // 저장/목록/복사/이름/삭제
   await p.click('#bSave');await p.waitForTimeout(1200);ok('D 저장 상태',await ev(p,()=>/저장됨/.test($('#saveStat').textContent)));
   await p.click('#bHome');await p.waitForTimeout(400);ok('D 목록 썸네일',await ev(p,()=>!!$('.pc .th').style.backgroundImage));
-  p.setPrompt('QA 복사본');await p.locator('.pc [data-a=copy]').first().click();await p.waitForTimeout(400);ok('D 복사',await p.locator('.pc').count()===2);
-  p.setPrompt('QA 개명');await p.locator('.pc').filter({hasText:'QA 복사본'}).locator('[data-a=ren]').click();await p.waitForTimeout(300);ok('D 이름 변경',await p.locator('.pc').filter({hasText:'QA 개명'}).count()===1);
-  await p.locator('.pc').filter({hasText:'QA 개명'}).locator('[data-a=open]').click();await p.waitForTimeout(500);ok('D 열기',await ev(p,()=>proj.title==='QA 개명'&&$('#home').hidden));
-  await p.click('#bHome');await p.waitForTimeout(300);await p.locator('.pc').filter({hasText:'QA 개명'}).locator('[data-a=del]').click();await p.waitForTimeout(300);
+  p.setPrompt('QA 복사본');await p.locator('#plist .pc [data-a=copy]').first().click();await p.waitForTimeout(400);ok('D 복사',await p.locator('#plist .pc').count()===2);
+  p.setPrompt('QA 개명');await p.locator('#plist .pc').filter({hasText:'QA 복사본'}).locator('[data-a=ren]').click();await p.waitForTimeout(300);ok('D 이름 변경',await p.locator('#plist .pc').filter({hasText:'QA 개명'}).count()===1);
+  await p.locator('#plist .pc').filter({hasText:'QA 개명'}).locator('[data-a=open]').click();await p.waitForTimeout(500);ok('D 열기',await ev(p,()=>proj.title==='QA 개명'&&$('#home').hidden));
+  await p.click('#bHome');await p.waitForTimeout(300);await p.locator('#plist .pc').filter({hasText:'QA 개명'}).locator('[data-a=del]').click();await p.waitForTimeout(300);
   ok('D 현재 프로젝트 삭제 후 상태',await ev(p,()=>proj.code===null&&$('.pc')!==null));
-  await p.locator('.pc [data-a=open]').first().click();await p.waitForTimeout(500);
+  await p.locator('#plist .pc [data-a=open]').first().click();await p.waitForTimeout(500);
   // json 내보내기/가져오기
-  await p.click('#bHome');await p.waitForTimeout(300);const dl=p.waitForEvent('download');await p.locator('.pc [data-a=bak]').first().click();const d=await dl;const jp='/tmp/qa-export.json';await d.saveAs(jp);await p.waitForTimeout(200);ok('D json 백업',fs.existsSync(jp)&&JSON.parse(fs.readFileSync(jp)).slides.length>0);
+  await p.click('#bHome');await p.waitForTimeout(300);const dl=p.waitForEvent('download');await p.locator('#plist .pc [data-a=bak]').first().click();const d=await dl;const jp='/tmp/qa-export.json';await d.saveAs(jp);await p.waitForTimeout(200);ok('D json 백업',fs.existsSync(jp)&&JSON.parse(fs.readFileSync(jp)).slides.length>0);
   p.setPrompt('가져옴');await p.setInputFiles('#fImport',jp);await p.waitForTimeout(1200);ok('D json 가져오기→새 프로젝트',await ev(p,()=>proj.title==='가져옴'&&!!proj.code));
   // 새로고침 후 마지막 프로젝트
   await p.reload({waitUntil:'load'});await p.waitForTimeout(900);ok('D 새로고침 복원',await ev(p,()=>proj.title==='가져옴'&&$('#home').hidden));
