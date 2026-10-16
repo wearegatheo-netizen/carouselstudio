@@ -129,7 +129,7 @@ kbd{background:var(--ui3);border-radius:4px;padding:1px 5px;font-size:var(--fs-x
  <aside class="right" id="rightWrap"><div class="sheetBar" id="sheetBar"><span id="sheetTitle">속성</span><button class="ic" id="sheetTog">▾</button></div><div id="right"></div></aside>
 </main>
 <div id="toast"></div>
-<div id="tpl" class="modal" hidden><div class="dlg"><div class="dh"><h2>템플릿 선택</h2><span class="empty">시안을 고르면 새 프로젝트로 만들어집니다</span><span style="flex:1"></span><button id="tClose" class="ic">✕</button></div><div id="tlist" class="plist"></div></div></div>
+<div id="tpl" class="modal" style="z-index:21" hidden><div class="dlg"><div class="dh"><h2>템플릿 선택</h2><span class="empty">시안을 고르면 새 프로젝트로 만들어집니다</span><span style="flex:1"></span><button id="tClose" class="ic">✕</button></div><div id="tlist" class="plist"></div></div></div>
 <div id="home" class="modal" hidden><div class="dlg">
  <div class="dh"><h2>프로젝트</h2><span id="homeStat" class="empty"></span><span style="flex:1"></span><button id="hNewT" class="primary">＋ 템플릿으로 새 프로젝트</button><button id="hNewB">＋ 빈 프로젝트</button><button id="bImport" class="ic" title="백업 파일(.json)에서 프로젝트 복원">백업 복원</button><input type="file" id="fImport" accept="application/json" hidden><button id="hClose" class="ic" title="닫기">✕</button></div>
  <div id="plist" class="plist"></div>
