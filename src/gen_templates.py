@@ -224,6 +224,41 @@ def hybrid(alternate=False):
                    (T('010-5109-1042 · @gatherallaround', size=28, weight=700, color=P), 0)], py=20, sh=48, size=96, solid=alt(6)))
     return S
 
+
+# ───────── 제목·눈썹 문구 (친근하되 정보 전달) — 줄 수는 원문과 동일하게 유지(레이아웃 높이 보존) ─────────
+COPY = {
+ 'GATHER ALL AROUND': '게더 올 어라운드 · 합주실 · 소공연 · 모임 공간',
+ 'GATHER ALL AROUND · 게더 올 어라운드': '게더 올 어라운드 · 합주실 · 소공연 · 모임 공간',
+ '같이 아끼고<br>같이 즐길<br><em>팀을 구합니다</em>': '우리 공간<br>같이 쓸 팀<br><em>찾고 있어요</em>',
+ '같이 아끼고 같이 즐길<br><em>팀을 구합니다</em>': '우리 공간 같이 쓸<br><em>팀을 찾고 있어요</em>',
+ '이런 공간이에요': '어떤 공간이냐면요',
+ '합주도, 소공연도,<br>뒷풀이 <em>보드게임</em>도': '합주도 공연도,<br>끝나면 <em>보드게임</em>',
+ '합주도 소공연도<br><em>보드게임</em>도': '합주도 공연도,<br>끝나면 <em>보드게임</em>',
+ '합주도, 소공연도,<br>뒷풀이 보드게임도': '합주도 공연도,<br>끝나면 보드게임까지',
+ '기본 세팅': '기본 장비 · 추가 비용 없음',
+ '몸만 오셔도<br>바로 <em>합주 시작</em>': '악기는 다 있으니<br><em>몸만 오세요</em>',
+ '몸만 오셔도<br><em>바로 합주</em>': '악기는 다 있어요,<br><em>몸만 오세요</em>',
+ '이용 가능 시간 · 2026.9.7 기준': '비어 있는 시간 · 2026.9.7 기준',
+ '지금 비어 있는<br><em>타임</em>': '이 시간은<br><em>비어 있어요</em>',
+ '지금 비어 있는 <em>타임</em>': '이 시간은 <em>비어 있어요</em>',
+ '월 고정팀': '월 고정팀 · 주 1회 · 5인 기준',
+ '4주 <em>20만원</em>': '4주에 <em>20만원</em>',
+ '주 1회, 4주 동안<br>우리 팀 <em>고정 타임</em>': '매주 한 번,<br>우리 팀 <em>고정 시간</em>',
+ '★ 고정팀 혜택': '★ 고정팀만의 혜택', '고정팀 혜택': '★ 고정팀만의 혜택',
+ '공간 이상의 것을<br><em>함께</em> 나눠요': '고정팀이 되면<br>이런 게 <em>따라와요</em>',
+ '공간 이상의 것을<br><em>함께</em>': '고정팀이 되면<br>이런 게 <em>따라와요</em>',
+ '공간 대관 · 시간 단위 · 최대 20명': '시간 단위 대관 · 5인 기준 · 최대 20명',
+ '공간 대관 · 시간 단위': '시간 단위 대관 · 최대 20명',
+ '공간 대관 · 최대 20명': '시간 단위 대관 · 5인 기준 · 최대 20명',
+ '평일 <em>2.5만원</em><br>주말 <em>4만원</em> / 시간': '하루만 써도 좋아요<br>평일 <em>2.5만</em> · 주말 <em>4만</em>',
+ '소공연 · 모임 · 리허설<br>최대 <em>20명</em>': '하루만 써도 좋아요<br>소공연 · 모임 · <em>리허설</em>',
+}
+def apply_copy(slides):
+    for s in slides:
+        for l in s['layers']:
+            if l['type'] == 'text' and l['html'] in COPY: l['html'] = COPY[l['html']]
+    return slides
+
 classic = json.load(open('template.json'))
 for s in classic:
     for l in s['layers']:
@@ -236,5 +271,7 @@ out = {
   'hybrid':  {'name': '다크 포스터', 'desc': '매 장 사진 + 큰 제목, 아래는 미니멀식 정돈된 목록', 'slides': hybrid()},
   'rhythm':  {'name': '다크 포스터 · 교차', 'desc': '표지·공간·혜택은 사진, 장비·시간·요금은 단색으로 교차', 'slides': hybrid(True)},
 }
+for k, v in out.items():
+    if k != 'classic': apply_copy(v['slides'])
 json.dump(out, open('templates.json', 'w'), ensure_ascii=False)
 print({k: len(v['slides']) for k, v in out.items()})
