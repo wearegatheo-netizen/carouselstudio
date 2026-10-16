@@ -36,7 +36,7 @@ def slide(photo, layers, px=50, py=50, sh=60, shA=92, bg='#14110E', pager=True, 
     return dict(id='S' + uid(), photo=photo, px=px, py=py, zoom=zoom, sh=sh, shA=shA, bg=bg, pager=pager, layers=layers)
 
 WM = 'Gather all around'
-GEAR = [('기타·베이스', '본인 악기 지참 · 앰프는 있어요'), ('마이크', 'Sennheiser e845s ×2'), ('키보드', 'Yamaha S90'), ('드럼', 'Mapex Mars + Yamaha RC 스네어'), ('믹서', 'Behringer XR-18'), ('스피커', 'Yamaha DBR15'), ('앰프', 'Blackstar HT Soloist 60 · Fender Champion 100 · Fender Rumble 500')]
+GEAR = [('기타·베이스', '본인 악기 지참 · 고정팀은 캐비넷에 두고 다녀요'), ('마이크', 'Sennheiser e845s ×2'), ('키보드', 'Yamaha S90'), ('드럼', 'Mapex Mars + Yamaha RC 스네어'), ('믹서', 'Behringer XR-18'), ('스피커', 'Yamaha DBR15'), ('앰프', 'Blackstar HT Soloist 60 · Fender Champion 100<br>Fender Rumble 500')]
 TIMES = [('월', '18:00 – 23:00', '고정팀 · 대관'), ('목', '18:00 – 23:00', '11/5부터 가능'), ('토', '09:00 – 14:00', '고정팀 · 대관'), ('토', '14:00 – 23:00', '대관만'), ('일', '09:00 – 14:00', '고정팀 · 대관'), ('일', '14:00 – 18:00', '고정팀 · 대관')]
 INQ = ['요일·시간대별로 상황이 자주 바뀌어요', '원하는 요일과 시간을 알려주시면 바로 확인해 드릴게요', '문의 010-5109-1042 · 인스타 DM @gatherallaround']
 BENE = ['내부 노트북 FL Studio 사용', '월 1회 평일 남는 시간 추가 사용', '이용 팀들과 교류 · 연합공연', '캐비넷 제공 (6개월 이상)']
@@ -157,7 +157,7 @@ def poster():
         f.bottom(items, bottom=130); return slide(photo, f.done(), py=py, sh=sh)
     S = [page('@studio1.jpg', 'Rehearsal · Space', 'GATHER ALL AROUND', '같이 아끼고<br>같이 즐길<br><em>팀을 구합니다</em>', ['합주실 · 소공연 · 모임 공간 · 월 고정팀 모집 · 시간 대관'], sh=62),
          page('@studio10.png', '01 · Space', '이런 공간이에요', '합주도 소공연도<br><em>보드게임</em>도', ['110인치 빔스크린 · 테이블 2 · 의자 15', '싱크대 · 내부 화장실 · 다양한 보드게임'], py=30),
-         page('@studio6.jpg', '02 · Gear', '기본 세팅', '몸만 오셔도<br><em>바로 합주</em>', ['기타·베이스는 본인 악기 지참 · 앰프는 있어요', 'Sennheiser e845s ×2 · Yamaha S90 · Mapex Mars · XR-18 · DBR15', 'Blackstar HT Soloist 60 · Fender Champion 100 · Rumble 500'], py=40, line_size=28),
+         page('@studio6.jpg', '02 · Gear', '기본 세팅', '몸만 오셔도<br><em>바로 합주</em>', ['기타·베이스는 본인 지참 · 고정팀은 캐비넷에 두고 다녀요', 'Sennheiser e845s ×2 · Yamaha S90 · Mapex Mars · XR-18 · DBR15', 'Blackstar HT Soloist 60 · Fender Champion 100 · Rumble 500'], py=40, line_size=28),
          page('@studio2.jpg', '03 · Time', '이용 가능 시간 · 문의 주세요', '비는 시간은<br>그때그때 <em>달라요</em>', INQ, line_size=28),
          page('@studio5.jpg', '04 · Monthly', '월 고정팀 · 4주 기준 · 5인 팀', '주 1회 <em>20만원</em><br>주 2회 <em>30만원</em>', ['한 타임 = 주 1회 고정 시간 · 공휴일 상관없이 4주 보장', '인원 추가 시 1명당 +5만원']),
          page('@studio8.png', '05 · Benefits', '고정팀 혜택', '공간 이상의 것을<br><em>함께</em>', ['FL Studio 사용 · 월 1회 평일 추가 사용', '팀 교류 · 연합공연 · 캐비넷(6개월 이상)'], py=30),
