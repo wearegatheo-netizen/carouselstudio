@@ -232,73 +232,84 @@ out['flyer'] = {'name': '라이브 플라이어', 'desc': '밝은 종이 · 코�
 json.dump(out, open('templates.json', 'w'), ensure_ascii=False)
 print({k: len(v['slides']) for k, v in out.items()})
 
-# ───────── 게더링 공연 안내 (v5 와펜 콘셉트 · 1080×1080) ─────────
+# ───────── 게더링 공연 안내 (v5 와펜 콘셉트 · 1080×1080 · 정제판) ─────────
 def gatheo():
-    BG, INK, WH, GR, LINE = '#E7E5E0', '#111111', '#FFFFFF', '#6F6C66', '#CFCDC8'
+    BG, INK, WH, GR, LINE, CARD = '#E9E7E2', '#111111', '#FFFFFF', '#77746E', '#D6D3CD', '#F4F3F0'
     PATCH = {'p-cherry': (235, 209), 'p-pink-guitar': (230, 261), 'p-flame': (173, 192), 'p-moon-star': (177, 174), 'p2-smile-daisy': (404, 419),
              'p-vinyl': (211, 182), 'p-checker-star': (213, 208), 'p-get-lucky': (222, 181), 'p-three-stars': (153, 169), 'p-pink-bolt': (155, 211),
-             'p3-smile-bolt': (459, 656), 'p-music-note': (134, 162), 'p-dice': (196, 158), 'p-loud-hot-crazy': (228, 181), 'p-black-cat': (185, 156)}
-    def pill(html, x, y, size=40, w=None, rot=0, align='center', padX=36, pad=18):  # 검은 자수 패치 느낌의 알약 라벨
-        l = T(html, font='blackhan', size=size, weight=400, color=WH, align=align, x=x, w=w or 400, bg=INK, bgA=100, border='#2A2A2A', borderA=100, borderW=4, radius=999, pad=pad, padX=padX, rot=rot, lh=1.0)
-        l['y'] = y; return l
-    def q(x, y, d=90, rot=0):  # 흰 물음표 패치
-        l = T('?', font='blackhan', size=round(d * .5), weight=400, color=INK, align='center', x=x, w=d, bg=WH, bgA=100, border=LINE, borderA=100, borderW=3, radius=999, pad=round(d * .25), padX=0, rot=rot, lh=1.0); l['y'] = y; return l
-    def patch(key, cx, cy, w, rot=0):  # 와펜 PNG(투명) — 중심 좌표 기준
+             'p3-smile-bolt': (459, 656), 'p-music-note': (134, 162), 'p-dice': (196, 158), 'p-loud-hot-crazy': (228, 181)}
+    def at(l, y, x=None):
+        l['y'] = y
+        if x is not None: l['x'] = x
+        return l
+    def mont(html, x, y, size, w, weight=800, color=INK, align='left', ls=0.02, lh=1.0):
+        return at(T(html, font='montserrat', size=size, weight=weight, color=color, align=align, x=x, w=w, ls=ls, lh=lh), y)
+    def topbar(n):  # 작은 캡션 줄: 왼쪽 브랜드·오른쪽 쪽번호
+        return [mont('GATHEO LIVE', 80, 72, 20, 400, 600, GR, ls=0.18), mont(f'{n:02d} / 05', 680, 72, 20, 320, 600, GR, 'right', ls=0.18)]
+    def head(html, y, size=76): return at(T(html, size=size, weight=900, color=INK, lh=1.18, accent=INK, nowrap=False), y)
+    def deck(html, y, size=28, color=GR): return at(T(html, size=size, weight=500, color=color, lh=1.55, accent=INK, nowrap=False), y)
+    def pill(html, x, y, size=26, w=320, font='montserrat', padX=28, pad=16, color=WH, bg=INK, ls=0.06, weight=800):  # 패치 라벨(기울임 없음)
+        return at(T(html, font=font, size=size, weight=weight, color=color, align='center', x=x, w=w, bg=bg, bgA=100, radius=999, pad=pad, padX=padX, lh=1.0, ls=ls), y)
+    def card(x, y, w, h, fill=CARD, radius=28, border=LINE, bw=2):
+        b = Line(fill, 100, x=x, w=w, h=h); b['y'] = y; b['radius'] = radius; b['border'] = border; b['borderA'] = 100; b['borderW'] = bw; return b
+    def patch(key, cx, cy, w, rot=0):
         pw, ph = PATCH[key]; h = round(w * ph / pw); l = Img('@' + key + '.png', round(cx - w / 2), w, h, radius=0); l['y'] = round(cy - h / 2); l['fit'] = 'contain'; l['rot'] = rot; return l
-    def body(html, y, size=32, color=INK, weight=500, x=80, w=920, align='left'):
-        l = T(html, size=size, weight=weight, color=color, x=x, w=w, lh=1.45, accent=INK, align=align, nowrap=False); l['y'] = y; return l
-    def oval(html, x, y, w, h, size):  # 타원 패치 + 가운데 글자
-        b = Line(INK, 100, x=x, w=w, h=h); b['y'] = y; b['radius'] = 999; b['borderW'] = 4; b['border'] = '#2A2A2A'; b['borderA'] = 100
-        t = T(html, font='blackhan', size=size, weight=400, color=WH, align='center', x=x, w=w, lh=1.0, pad=round((h - size) / 2)); t['y'] = y
-        return [b, t]
+    def rule(y, x=80, w=920): b = Line(LINE, 100, x=x, w=w, h=2); b['y'] = y; return b
     S = []
-    # 1 표지: v5 그대로
+    # 1 표지
     im = Img('@v5.jpg', 0, 1080, 1080, radius=0); im['y'] = 0
     S.append(slide('', [im], bg=BG, pager=False))
-    # 2 위치
-    L = [pill('26/11/21(Sat) 5PM', 80, 70, size=40, w=560, align='left', padX=40)]
-    L += oval('CLUB FF', 300, 190, 480, 180, 96)
-    L += [q(900, 60, 96, rot=12), q(880, 300, 72, rot=-10), q(60, 300, 80, rot=8)]
-    mp = Img('@map-placeholder.png', 80, 920, 440, radius=24); mp['y'] = 400; mp['border'] = WH; mp['borderA'] = 100; mp['borderW'] = 6; L.append(mp)
-    L.append(body('<b>11월 21일 토요일 오후 5시</b>, CLUB FF에서 열리는 이번 공연!', 886, size=32))
-    L.append(body('테마는 <b>게더링을 여러분과 같이 꾸미는 것</b>입니다.', 936, size=32))
-    L.append(body('위치 · 오시는 길은 프로필 링크의 공연 페이지에서 지도로 확인하세요', 1000, size=22, color=GR))
+    # 2 일시·장소
+    L = topbar(2)
+    L.append(mont('SAT 21 NOV 2026 · 5PM', 80, 150, 22, 920, 600, GR, ls=0.14))
+    L.append(head('토요일 오후 5시,<br>CLUB FF에서 만나요', 196))
+    L.append(deck('<b>11월 21일(토) 오후 5시.</b> 이번 공연의 테마는<br>게더링을 여러분과 함께 꾸미는 것입니다.', 400))
+    mp = Img('@map-placeholder.png', 80, 920, 420, radius=28); mp['y'] = 540; mp['border'] = WH; mp['borderA'] = 100; mp['borderW'] = 4; L.append(mp)
+    L.append(pill('CLUB FF · HONGDAE', 112, 572, 24, 360))
+    L.append(mont('MAP', 860, 586, 20, 120, 600, GR, 'right', ls=0.18))
+    L.append(deck('오시는 길은 프로필 링크의 공연 페이지에서 지도로 확인할 수 있어요.', 1000, 22))
     S.append(slide('', L, bg=BG, pager=False))
-    # 3 꾸민 포스터 예시
-    L = [pill('포스터 꾸미기', 80, 60, size=40, w=380, padX=40), q(940, 60, 90, rot=15)]
-    base = Img('@v5.jpg', 220, 640, 640, radius=28); base['y'] = 140; base['border'] = WH; base['borderA'] = 100; base['borderW'] = 6; L.append(base)
-    for key, cx, cy, w, rot in [('p-dice', 267, 187, 90, -10), ('p-cherry', 416, 205, 100, 8), ('p-pink-guitar', 570, 170, 110, -14), ('p-flame', 753, 193, 90, 6),
-                                ('p-moon-star', 830, 294, 100, 0), ('p2-smile-daisy', 498, 294, 100, 0), ('p-vinyl', 267, 413, 100, -8), ('p-checker-star', 825, 460, 90, 10),
-                                ('p-get-lucky', 760, 567, 120, -6), ('p-three-stars', 605, 662, 90, 0), ('p-pink-bolt', 297, 691, 70, 12), ('p3-smile-bolt', 505, 733, 90, -8),
-                                ('p-music-note', 671, 733, 60, 10), ('p-loud-hot-crazy', 789, 674, 120, 5)]:
-        L.append(patch(key, cx, cy, w, rot))
-    L.append(pill('인기 포스터 = 경품!', 640, 760, size=32, w=380, rot=-6, padX=30, pad=14))
-    L.append(body('저희 <b>게더링 프로필 링크</b>로 가시면 여러분이 직접', 830, size=30))
-    L.append(body('이번 공연 포스터를 꾸며 주실 수 있어요.', 876, size=30))
-    L.append(body('<b>인기가 많은 포스터는 공연 당일 경품</b>을 드립니다!', 922, size=30))
-    L.append(body('프로필 링크 → 포스터 꾸미기 → 와펜 붙이고 저장', 990, size=22, color=GR))
+    # 3 포스터 꾸미기
+    L = topbar(3)
+    L.append(mont('DECORATE THE POSTER', 80, 150, 22, 920, 600, GR, ls=0.14))
+    L.append(at(T('포스터를 직접<br>꾸며 보세요', size=60, weight=900, color=INK, lh=1.2, x=80, w=440, nowrap=False), 196))
+    L.append(at(T('프로필 링크로 가시면<br>이번 공연 포스터에 와펜을 붙여<br>나만의 버전을 만들 수 있어요.', size=26, weight=500, color=GR, lh=1.55, x=80, w=440, nowrap=False), 372))
+    base = Img('@v5.jpg', 560, 440, 440, radius=24); base['y'] = 196; base['border'] = WH; base['borderA'] = 100; base['borderW'] = 4; L.append(base)
+    sc = 440 / 1080
+    for key, px, py, w, rot in [('p-cherry', 330, 110, 70, 6), ('p-pink-guitar', 590, 95, 78, -12), ('p-flame', 900, 90, 62, 0), ('p-moon-star', 1030, 260, 70, 0),
+                                ('p2-smile-daisy', 470, 260, 70, 0), ('p-vinyl', 80, 460, 70, -6), ('p-get-lucky', 910, 720, 84, -6), ('p-three-stars', 650, 880, 62, 0),
+                                ('p3-smile-bolt', 480, 1000, 64, -8), ('p-loud-hot-crazy', 960, 900, 84, 4)]:
+        L.append(patch(key, 560 + px * sc, 196 + py * sc, w, rot))
+    L.append(card(80, 700, 920, 240))
+    L.append(mont('HOW TO', 120, 736, 18, 300, 600, GR, ls=0.18))
+    L.append(deck('프로필 링크 → <b>포스터 꾸미기</b> → 와펜 붙이고 저장', 770, 28, INK))
+    L.append(deck('인기가 많은 포스터는 <b>공연 당일 경품</b>을 드립니다.', 820, 28, INK))
+    L.append(pill('POPULAR POSTER → PRIZE', 120, 876, 20, 400, padX=24, pad=12))
     S.append(slide('', L, bg=BG, pager=False))
     # 4 경품
-    L = [pill('LUCKY DRAW', 80, 60, size=40, w=360, padX=40), pill('공연 당일 즉석추첨', 460, 66, size=30, w=380, padX=30, pad=14, rot=3)]
-    for x, shape in [(80, 'circle'), (400, 'round'), (720, 'pill')]:
-        b = Line(INK, 100, x=x, w=280, h=280); b['y'] = 200; b['radius'] = {'circle': 999, 'round': 48, 'pill': 140}[shape]; b['borderW'] = 4; b['border'] = '#2A2A2A'; b['borderA'] = 100; L.append(b)
-        t = T('?', font='blackhan', size=150, weight=400, color=WH, align='center', x=x, w=280, lh=1.0, pad=65); t['y'] = 200; L.append(t)
-    L.append(pill('15만원 상당', 330, 452, size=44, w=420, rot=-4, padX=40, pad=16))
-    L.append(body('공연 당일 <b>포스터 추첨</b>뿐만 아니라', 600, size=34))
-    L.append(body('<b>15만원 상당의 즉석추첨 경품</b>도 준비했어요.', 652, size=34))
-    L.append(body('시간 되시는 분들 놀러오세요 🙌', 704, size=34))
-    L += [q(70, 820, 90, rot=-12), q(190, 900, 70, rot=20), q(900, 830, 100, rot=10), q(990, 985, 70, rot=-15)]
-    L.append(body('경품은 공연 당일 공개 · 추첨 참여는 현장에서 안내', 1000, size=22, color=GR, align='center'))
+    L = topbar(4)
+    L.append(mont('LUCKY DRAW', 80, 150, 22, 920, 600, GR, ls=0.14))
+    L.append(head('15만원 상당<br>즉석추첨 경품', 196))
+    L.append(deck('공연 당일 포스터 추첨뿐만 아니라 현장 즉석추첨도 있어요.<br>시간 되시는 분들 놀러오세요 🙌', 400))
+    for i, x in enumerate([80, 400, 720]):
+        b = Line(INK, 100, x=x, w=280, h=280); b['y'] = 560; b['radius'] = 32; L.append(b)
+        L.append(mont('?', x, 560, 150, 280, 800, WH, 'center', 0, lh=1.0)); L[-1]['pad'] = 65
+        L.append(mont(f'PRIZE 0{i + 1}', x, 860, 18, 280, 600, GR, 'center', 0.18))
+    L.append(mont('₩150,000 VALUE', 80, 1000, 20, 920, 600, GR, ls=0.18))
     S.append(slide('', L, bg=BG, pager=False))
-    # 5 세부 내용
-    L = oval('SHOW INFO', 80, 60, 420, 120, 64) + [q(940, 60, 90, rot=12), q(840, 130, 60, rot=-8)]
-    rows = [('일시', '<b>2026. 11. 21 (토) 오후 5시</b>'), ('장소', '<b>CLUB FF</b> (홍대) · 오시는 길은 공연 페이지 지도 참고'), ('주최', '게더링 GatheO'),
-            ('테마', '여러분과 <b>같이 꾸미는</b> 게더링'), ('이벤트', '포스터 꾸미기 인기작 경품 · <b>15만원 상당 즉석추첨</b>'), ('예매', '프로필 링크 → 공연 예매 · 가격·잔여석 확인')]
-    y = 230
+    # 5 공연 정보
+    L = topbar(5)
+    L.append(mont('SHOW INFO', 80, 150, 22, 920, 600, GR, ls=0.14))
+    L.append(head('공연 안내', 196, 76))
+    rows = [('DATE', '2026. 11. 21 (토) 오후 5시'), ('VENUE', 'CLUB FF · 홍대'), ('HOST', '게더링 GatheO'),
+            ('THEME', '여러분과 함께 꾸미는 게더링'), ('EVENT', '포스터 꾸미기 인기작 경품 · 15만원 상당 즉석추첨'), ('TICKET', '프로필 링크 → 공연 예매 · 가격·잔여석 확인')]
+    y = 340
     for k, v in rows:
-        L.append(pill(k, 80, y, size=26, w=150, padX=0, pad=12))
-        L.append(body(v, y + 2, size=30, x=260, w=740)); y += 100
-    L.append(body('@gatherallaround · 문의는 DM으로 주세요', 990, size=24, color=GR, align='center'))
+        L.append(mont(k, 80, y + 6, 18, 160, 600, GR, ls=0.18))
+        L.append(at(T(v, size=30, weight=700, color=INK, x=260, w=740, lh=1.3, nowrap=False), y))
+        L.append(rule(y + 68)); y += 96
+    L.append(pill('예매 · 프로필 링크', 80, 946, 24, 300, font='body', weight=700, ls=0))
+    L.append(mont('@GATHERALLAROUND · DM', 400, 962, 20, 600, 600, GR, 'right', ls=0.14))
     S.append(slide('', L, bg=BG, pager=False))
     for s in S:
         for l in s['layers']: l.pop('_h', None)
