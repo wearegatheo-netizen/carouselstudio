@@ -38,7 +38,7 @@ def slide(photo, layers, px=50, py=50, sh=60, shA=92, bg='#14110E', pager=True, 
 WM = 'Gather all around'
 GEAR = [('기타·베이스', '본인 악기 지참 · 고정팀은 캐비넷에 두고 다녀요'), ('마이크', 'Sennheiser e845s ×2'), ('키보드', 'Yamaha S90'), ('드럼', 'Mapex Mars + Yamaha RC 스네어'), ('믹서', 'Behringer XR-18'), ('스피커', 'Yamaha DBR15'), ('앰프', 'Blackstar HT Soloist 60 · Fender Champion 100<br>Fender Rumble 500')]
 TIMES = [('월', '18:00 – 23:00', '고정팀 · 대관'), ('목', '18:00 – 23:00', '11/5부터 가능'), ('토', '09:00 – 14:00', '고정팀 · 대관'), ('토', '14:00 – 23:00', '대관만'), ('일', '09:00 – 14:00', '고정팀 · 대관'), ('일', '14:00 – 18:00', '고정팀 · 대관')]
-INQ = ['요일·시간대별로 상황이 자주 바뀌어요', '원하는 요일과 시간을 알려주시면 바로 확인해 드릴게요', '문의 010-5109-1042 · 인스타 DM @gatherallaround']
+INQ = ['요일·시간대별로 상황이 자주 바뀌어요', '원하는 요일과 시간을 알려주시면 바로 확인해 드릴게요', '문의는 인스타 DM으로 · @gatherallaround']
 BENE = ['내부 노트북 FL Studio 사용', '월 1회 평일 남는 시간 추가 사용', '이용 팀들과 교류 · 연합공연', '캐비넷 제공 (6개월 이상)']
 
 # ───────── 다크 포스터 (확정 시안) ─────────
@@ -92,15 +92,15 @@ def hybrid(alternate=False):
     S.append(page('@studio6.jpg', '02 · Gear', '기본 세팅', '몸만 오셔도<br>바로 <em>합주 시작</em>',
                   rows_kv([(k, v, 14) for k, v in GEAR]), py=40, sh=30, solid=alt(2)))
     S.append(page('@studio2.jpg', '03 · Time', '이용 가능 시간 · 문의 주세요', '비는 시간은<br>그때그때 <em>달라요</em>',
-                  [L(t) for t in INQ] + [L('대관 가능 시간은 gatherallaround.com/#perf 에서도 확인', size=24, color=M, gap=0)], sh=36, solid=alt(3)))
+                  [L(t) for t in INQ] + [L('대관 예약은 프로필 링크에서 할 수 있어요', size=24, color=M, gap=0)], sh=36, solid=alt(3)))
     S.append(page('@studio5.jpg', '04 · Monthly', '월 고정팀 · 4주 기준 · 5인 팀', '주 1회 <em>20만원</em><br>주 2회 <em>30만원</em>',
                   [L('한 타임 = 주 1회 고정 시간, 4주 동안 보장'), L('공휴일 상관없이 4주 · 인원 추가 시 1명당 +5만원', gap=0)], sh=52, solid=alt(4)))
     S.append(page('@studio8.png', '05 · Benefits', '★ 고정팀 혜택', '공간 이상의 것을<br><em>함께</em> 나눠요',
                   [L(f'<em>{i}</em>&nbsp;&nbsp;{t}') for i, t in enumerate(BENE, 1)][:-1] + [L(f'<em>4</em>&nbsp;&nbsp;{BENE[3]}', gap=0)], py=30, sh=42))
     S.append(page('@studio7.png', '06 · Rental', '공간 대관 · 시간 단위 · 최대 20명', '평일 <em>2.5만원</em><br>주말 <em>4만원</em> / 시간',
                   [L('5인 기준 · 인원 추가 1명당 +5,000원 · 원하는 시간은 문의 주세요', size=26, color=M, gap=28),
-                   (T('gatherallaround.com/#perf', font='display', size=56, color=A, lh=1.1), 16),
-                   (T('010-5109-1042 · @gatherallaround', size=28, weight=700, color=P), 0)], py=20, sh=48, size=96, solid=alt(6)))
+                   (T('예약은 프로필 링크 · 문의는 DM', font='display', size=52, color=A, lh=1.1), 16),
+                   (T('@gatherallaround', size=28, weight=700, color=P), 0)], py=20, sh=48, size=96, solid=alt(6)))
     return S
 
 
@@ -163,16 +163,16 @@ def flyer():
     L.append(tag('팀 모집 중!', 640, 650, w=320, rot=-8, size=36))
     L.append(put(H('같이 쓸 팀<br><em>찾고 있어요</em>', size=120), 850))
     L.append(put(T('월 고정팀 모집 · 시간 단위 대관', size=34, weight=700, color=INK), 1130))
-    L.append(put(T('gatherallaround.com', size=24, weight=500, color=MUT), 1250))
+    L.append(put(T('@gatherallaround · 예약은 프로필 링크', size=24, weight=500, color=MUT), 1250))
     S.append(slide('', L, bg=CREAM))
     # 2 공간
     L = [num('01'), wm(), put(H('합주도 공연도,<br>끝나면 <em>보드게임</em>'), 250)]
-    im = Img('@studio10.png', 80, 920, 380, radius=24); im['y'] = 480; L.append(im)
+    im = Img('@studio11.jpg', 80, 920, 380, radius=24); im['y'] = 480; L.append(im)
     L += strip(900, '110인치 빔스크린 · 캠핑 테이블 2 · 의자 15') + strip(972, '싱크대 · 내부 화장실 · 다양한 보드게임')
     L.append(put(T('다양한 팀들과 교류하고 연합공연도 함께 열어요', size=28, weight=500, color=MUT), 1070))
     S.append(slide('', L, bg=CREAM))
     # 3 장비
-    L = [num('02'), wm(), put(H('앰프·드럼은 있어요,<br><em>기타·베이스</em>만 챙겨요'), 250)]
+    L = [num('02'), wm(), put(H('세팅은 다 돼 있어요,<br><em>기타·베이스</em>만 챙겨요'), 250)]
     L.append(box(80, 480, 920, 580, BLUE))
     y = 522
     for k, v in GEAR:
@@ -186,8 +186,8 @@ def flyer():
     L.append(box(80, 480, 920, 440, YEL))
     L.append(put(H('원하는 요일·시간을<br>알려주시면 바로 확인!', size=56, lh=1.2, x=130, w=820), 530))
     L.append(put(T('요일·시간대별로 상황이 자주 바뀌어요', size=30, weight=500, color=INK, x=130, w=820), 700))
-    L.append(put(T('문의 010-5109-1042 · 인스타 DM @gatherallaround', size=30, weight=700, color=INK, x=130, w=820), 752))
-    L.append(put(T('대관 가능 시간은 gatherallaround.com/#perf 에서도 확인', size=24, weight=500, color='#5A5546', x=130, w=820), 820))
+    L.append(put(T('문의는 DM으로 주세요 · @gatherallaround', size=30, weight=700, color=INK, x=130, w=820), 752))
+    L.append(put(T('대관 예약은 프로필 링크에서 할 수 있어요', size=24, weight=500, color='#5A5546', x=130, w=820), 820))
     im = Img('@studio2.jpg', 80, 920, 270, radius=24); im['y'] = 970; L.append(im)
     S.append(slide('', L, bg=CREAM))
     # 5 고정팀
@@ -210,16 +210,16 @@ def flyer():
         L.append(put(H(str(i), size=34, color=WH, x=80, w=64, lh=1.0, align='center', pad=15), y))
         L.append(put(T(t, size=34, weight=700, color=INK, x=170, w=830, lh=1.0, pad=14), y))
         y += 104
-    im = Img('@studio8.png', 80, 920, 300, radius=24); im['y'] = 940; L.append(im)
+    im = Img('@studio10.png', 80, 920, 300, radius=24); im['y'] = 940; L.append(im)
     S.append(slide('', L, bg=CREAM))
     # 7 대관 + 문의
     L = [num('06'), wm(), put(H('하루만 써도 좋아요<br>평일 <em>2.5만</em> · 주말 <em>4만</em>'), 250)]
     L.append(put(T('시간 단위 대관 · 5인 기준 · 최대 20명 · 인원 추가 1명당 +5,000원', size=26, weight=500, color=MUT), 470))
     L.append(box(80, 540, 920, 500, BLUE))
     L.append(put(T('예약 · 문의', size=24, weight=700, color=YEL, x=130, w=820, ls=0.08), 586))
-    L.append(put(H('gatherallaround.com/#perf', size=46, color=WH, x=130, w=820, lh=1.0), 632))
-    L.append(put(H('010-5109-1042', size=58, color=WH, x=130, w=820, lh=1.0), 700))
-    L.append(put(T('인스타그램 @gatherallaround · DM 환영', size=30, weight=700, color=WH, x=130, w=820), 810))
+    L.append(put(H('예약은 프로필 링크', size=58, color=WH, x=130, w=820, lh=1.0), 630))
+    L.append(put(H('문의는 DM으로', size=58, color=YEL, x=130, w=820, lh=1.0), 706))
+    L.append(put(T('@gatherallaround', size=34, weight=700, color=WH, x=130, w=820), 806))
     L.append(put(T('원하는 시간을 알려주시면 바로 확인해 드려요', size=28, weight=500, color='#DCE4FF', x=130, w=820), 866))
     L.append(tag('하루만 써도 좋아요', 600, 1004, w=380, rot=6, size=30))
     L.append(put(T(WM, font='display', size=30, color=INK, x=80, w=500), 1240))
