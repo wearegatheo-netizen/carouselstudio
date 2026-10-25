@@ -140,8 +140,10 @@ json.dump(out, open('templates.json', 'w'), ensure_ascii=False)
 print({k: len(v['slides']) for k, v in out.items()})
 
 # ───────── 라이브 플라이어 (복숭아 크림 · 테라코타 · 머스터드 · 검은고딕) ─────────
-def flyer():
-    CREAM, INK, BLUE, YEL, MUT, WH = '#F7ECDD', '#2B1E17', '#D4603A', '#F5B942', '#8A6F5E', '#FFFFFF'  # 따뜻한 계열(2026-10-25): 복숭아 크림·에스프레소·테라코타·머스터드·웜 토프
+def flyer(dark=False):
+    # 따뜻한 계열(2026-10-25): 복숭아 크림·에스프레소·테라코타·머스터드·웜 토프 / dark=True 는 같은 색을 어두운 바탕에(2026-10-25)
+    if dark: CREAM, INK, BLUE, YEL, MUT, WH, ONYEL, DARKC = '#1B1411', '#F4E9DC', '#D4603A', '#F5B942', '#A89383', '#FFFFFF', '#2B1E17', '#3A2C25'
+    else:    CREAM, INK, BLUE, YEL, MUT, WH, ONYEL, DARKC = '#F7ECDD', '#2B1E17', '#D4603A', '#F5B942', '#8A6F5E', '#FFFFFF', '#2B1E17', '#2B1E17'
     def H(html, size=92, color=INK, lh=1.05, **kw):  # 검은고딕 제목
         return T(html, font='blackhan', size=size, weight=400, color=color, lh=lh, accent=BLUE, **kw)
     def num(n): return H(n, size=150, color=BLUE, x=80, w=400, lh=1.0, y=72)
@@ -152,9 +154,9 @@ def flyer():
         if x is not None: l['x'] = x
         return l
     def tag(html, x, y, w=300, rot=-7, size=32):  # 기울어진 노란 라벨
-        return put(T(html, font='blackhan', size=size, weight=400, color=INK, align='center', x=x, w=w, bg=YEL, bgA=100, radius=999, pad=14, padX=24, rot=rot, lh=1.0), y)
+        return put(T(html, font='blackhan', size=size, weight=400, color=ONYEL, align='center', x=x, w=w, bg=YEL, bgA=100, radius=999, pad=14, padX=24, rot=rot, lh=1.0), y)
     def strip(y, html):  # 노란 형광 줄 + 글자
-        return [box(80, y, 920, 56, YEL, radius=10), put(T(html, size=32, weight=700, color=INK, x=96, w=888, lh=1.0, pad=12), y)]
+        return [box(80, y, 920, 56, YEL, radius=10), put(T(html, size=32, weight=700, color=ONYEL, x=96, w=888, lh=1.0, pad=12), y)]
     S = []
     # 1 표지
     L = [box(0, 0, 1080, 790, BLUE, radius=0)]
@@ -184,15 +186,15 @@ def flyer():
     # 4 시간 문의
     L = [num('03'), wm(), put(H('비는 시간은<br>그때그때 <em>달라요</em>'), 250)]
     L.append(box(80, 480, 920, 440, YEL))
-    L.append(put(H('원하는 요일·시간을<br>알려주시면 바로 확인!', size=56, lh=1.2, x=130, w=820), 530))
-    L.append(put(T('요일·시간대별로 상황이 자주 바뀌어요', size=30, weight=500, color=INK, x=130, w=820), 700))
-    L.append(put(T('문의는 DM으로 주세요 · @gatherallaround', size=30, weight=700, color=INK, x=130, w=820), 752))
+    L.append(put(H('원하는 요일·시간을<br>알려주시면 바로 확인!', size=56, lh=1.2, x=130, w=820, color=ONYEL), 530))
+    L.append(put(T('요일·시간대별로 상황이 자주 바뀌어요', size=30, weight=500, color=ONYEL, x=130, w=820), 700))
+    L.append(put(T('문의는 DM으로 주세요 · @gatherallaround', size=30, weight=700, color=ONYEL, x=130, w=820), 752))
     L.append(put(T('대관 예약은 프로필 링크에서 할 수 있어요', size=24, weight=500, color='#6B5240', x=130, w=820), 820))
     im = Img('@studio2.jpg', 80, 920, 270, radius=24); im['y'] = 970; L.append(im)
     S.append(slide('', L, bg=CREAM))
     # 5 고정팀
     L = [num('04'), wm(), put(H('매주 한 번,<br>우리 팀 <em>고정 시간</em>'), 250)]
-    for i, (x, fill, lab, price) in enumerate([(80, BLUE, '주 1회', '20만원'), (550, INK, '주 2회', '30만원')]):
+    for i, (x, fill, lab, price) in enumerate([(80, BLUE, '주 1회', '20만원'), (550, DARKC, '주 2회', '30만원')]):
         L.append(box(x, 500, 450, 300, fill))
         L.append(put(T(lab, size=28, weight=700, color=YEL, x=x + 40, w=370), 540))
         L.append(put(H(price, size=96, color=WH, x=x + 40, w=390, lh=1.0), 596))
@@ -229,6 +231,7 @@ def flyer():
     return S
 
 out['flyer'] = {'name': '라이브 플라이어', 'desc': '복숭아 크림 종이 · 테라코타 색면 · 머스터드 강조 · 검은고딕 제목', 'slides': apply_copy(flyer())}
+out['flyer_dark'] = {'name': '라이브 플라이어 · 다크', 'desc': '같은 구성을 어두운 에스프레소 바탕에 · 테라코타 · 머스터드', 'slides': apply_copy(flyer(True))}
 json.dump(out, open('templates.json', 'w'), ensure_ascii=False)
 print({k: len(v['slides']) for k, v in out.items()})
 
