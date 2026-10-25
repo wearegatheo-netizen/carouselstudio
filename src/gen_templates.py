@@ -141,92 +141,89 @@ print({k: len(v['slides']) for k, v in out.items()})
 
 # ───────── 라이브 플라이어 (복숭아 크림 · 테라코타 · 머스터드 · 검은고딕) ─────────
 def flyer(dark=False):
-    # 따뜻한 계열(2026-10-25): 복숭아 크림·에스프레소·테라코타·머스터드·웜 토프 / dark=True 는 같은 색을 어두운 바탕에(2026-10-25)
-    if dark: CREAM, INK, BLUE, YEL, MUT, WH, ONYEL, DARKC = '#1B1411', '#F4E9DC', '#D4603A', '#F5B942', '#A89383', '#FFFFFF', '#2B1E17', '#3A2C25'
-    else:    CREAM, INK, BLUE, YEL, MUT, WH, ONYEL, DARKC = '#F7ECDD', '#2B1E17', '#D4603A', '#F5B942', '#8A6F5E', '#FFFFFF', '#2B1E17', '#2B1E17'
-    def H(html, size=92, color=INK, lh=1.05, **kw):  # 검은고딕 제목
-        return T(html, font='blackhan', size=size, weight=400, color=color, lh=lh, accent=BLUE, **kw)
-    def num(n): return H(n, size=150, color=BLUE, x=80, w=400, lh=1.0, y=72)
-    def wm(color=INK): return T(WM, font='display', size=28, color=color, align='right', x=580, w=420, y=96)
-    def box(x, y, w, h, fill, radius=28, a=100): b = Line(fill, a, x=x, w=w, h=h); b['y'] = y; b['radius'] = radius; return b
-    def put(l, y, x=None):
+    # 2026-10-25 정돈판: 격자(여백 80) · 세로 리듬 고정 — 캡션 72 / 제목 136 / 설명 318 / 본문 440~1200 / 하단 캡션 1246
+    if dark: BG, INK, PRI, YEL, MUT, WH, ONYEL, DARKC, LINE, SOFT = '#1B1411', '#F4E9DC', '#D4603A', '#F5B942', '#A89383', '#FFFFFF', '#2B1E17', '#3A2C25', '#3D2F28', '#FBE4D6'
+    else:    BG, INK, PRI, YEL, MUT, WH, ONYEL, DARKC, LINE, SOFT = '#F7ECDD', '#2B1E17', '#D4603A', '#F5B942', '#8A6F5E', '#FFFFFF', '#2B1E17', '#2B1E17', '#E6D9C8', '#FBE4D6'
+    def at(l, y, x=None):
         l['y'] = y
         if x is not None: l['x'] = x
         return l
-    def tag(html, x, y, w=300, rot=-7, size=32):  # 기울어진 노란 라벨
-        return put(T(html, font='blackhan', size=size, weight=400, color=ONYEL, align='center', x=x, w=w, bg=YEL, bgA=100, radius=999, pad=14, padX=24, rot=rot, lh=1.0), y)
-    def strip(y, html):  # 노란 형광 줄 + 글자
-        return [box(80, y, 920, 56, YEL, radius=10), put(T(html, size=32, weight=700, color=ONYEL, x=96, w=888, lh=1.0, pad=12), y)]
+    def cap(html, y, x=80, w=500, align='left', color=MUT):  # 영문 소캡션(Montserrat)
+        return at(T(html, font='montserrat', size=20, weight=600, color=color, align=align, x=x, w=w, ls=0.16, lh=1.0), y)
+    def kcap(html, y, x=80, w=500, align='left', color=MUT):  # 한글 소캡션
+        return at(T(html, size=20, weight=700, color=color, align=align, x=x, w=w, ls=0.06, lh=1.0), y)
+    def wm(y=66, color=INK): return at(T(WM, font='display', size=28, color=color, align='right', x=580, w=420), y)
+    def head(html, y=136, size=76, color=INK, x=80, w=920):
+        return at(T(html, font='blackhan', size=size, weight=400, color=color, lh=1.1, accent=PRI, x=x, w=w, nowrap=False), y)
+    def deck(html, y=318, color=MUT, size=28):
+        return at(T(html, size=size, weight=500, color=color, lh=1.5, accent=INK, nowrap=False), y)
+    def body(html, x, y, w, size=28, color=INK, weight=500, lh=1.4, align='left'):
+        return at(T(html, size=size, weight=weight, color=color, x=x, w=w, lh=lh, accent=PRI, align=align, nowrap=False), y)
+    def card(x, y, w, h, fill, radius=28): b = Line(fill, 100, x=x, w=w, h=h); b['y'] = y; b['radius'] = radius; return b
+    def rule(y, x=80, w=920): b = Line(LINE, 100, x=x, w=w, h=2); b['y'] = y; return b
+    def chip(html, x, y, w=200, fill=YEL, color=ONYEL):  # 작은 알약(기울임 없음)
+        return at(T(html, size=22, weight=700, color=color, align='center', x=x, w=w, bg=fill, bgA=100, radius=999, pad=10, padX=20, lh=1.0), y)
+    def strip(y, html):  # 머스터드 줄 한 개
+        return [card(80, y, 920, 56, YEL, 12), at(T(html, size=27, weight=700, color=ONYEL, x=104, w=872, lh=1.0, pad=13), y)]
+    def photo(key, x, y, w, h, radius=24): im = Img('@' + key, x, w, h, radius=radius); im['y'] = y; return im
+    def foot(): return [kcap('@gatherallaround · 예약은 프로필 링크', 1246, w=700)]
+    def price_card(x, fill, lab, price, sub, y=440, h=360):
+        return [card(x, y, 450, 360 if h is None else h, fill), kcap(lab, y + 48, x=x + 40, w=370, color=YEL),
+                head(price, y + 96, size=92, color=WH, x=x + 40, w=390), body(sub, x + 40, y + h - 76, 370, 24, color=SOFT)]
     S = []
     # 1 표지
-    L = [box(0, 0, 1080, 790, BLUE, radius=0)]
-    L += [put(T(WM, font='display', size=28, color=WH, x=80, w=500), 40), put(T('합주실 · 소공연 · 모임 공간', size=24, weight=700, color=YEL, align='right', x=580, w=420, ls=0.06), 42)]
-    im = Img('@studio1.jpg', 80, 920, 613, radius=28); im['y'] = 96; im['border'] = WH; im['borderA'] = 100; im['borderW'] = 8; L.append(im)  # 3:2 원본 비율
-    L.append(tag('팀 모집 중!', 640, 660, w=320, rot=-8, size=36))
-    L.append(put(H('우리 공간,<br><em>같이 쓸래요?</em>', size=120), 850))
-    L.append(put(T('월 고정팀 모집 · 시간 단위 대관', size=34, weight=700, color=INK), 1130))
-    L.append(put(T('@gatherallaround · 예약은 프로필 링크', size=24, weight=500, color=MUT), 1250))
-    S.append(slide('', L, bg=CREAM))
+    L = [at(T(WM, font='display', size=30, color=INK, x=80, w=500), 66), kcap('합주실 · 소공연 · 모임 공간', 72, x=580, w=420, align='right')]
+    L.append(photo('studio1.jpg', 80, 140, 920, 613, 28))
+    L.append(chip('팀 모집 중', 80, 796, w=180))
+    L.append(head('우리 공간,<br><em>같이 쓸래요?</em>', 856, size=104))
+    L.append(body('월 고정팀 모집 · 시간 단위 대관', 80, 1096, 920, 30, weight=700))
+    L += foot(); S.append(slide('', L, bg=BG))
     # 2 공간
-    L = [num('01'), wm(), put(H('합주도 공연도,<br>끝나면 <em>보드게임</em>'), 236)]
-    im = Img('@studio11.jpg', 80, 920, 613, radius=24); im['y'] = 448; L.append(im)  # 3:2 원본 비율
-    L += strip(1082, '110인치 빔스크린 · 캠핑 테이블 2 · 의자 15') + strip(1154, '싱크대 · 내부 화장실 · 다양한 보드게임')
-    L.append(put(T('다양한 팀들과 교류하고 연합공연도 함께 열어요', size=24, weight=500, color=MUT), 1236))
-    S.append(slide('', L, bg=CREAM))
+    L = [cap('01 · SPACE', 72), wm(), head('합주도 공연도,<br>끝나면 <em>보드게임</em>'), deck('다양한 팀들과 교류하고 연합공연도 함께 열어요.')]
+    L.append(photo('studio11.jpg', 80, 440, 920, 613))
+    L += strip(1080, '110인치 빔스크린 · 캠핑 테이블 2 · 의자 15') + strip(1148, '싱크대 · 내부 화장실 · 다양한 보드게임')
+    L += foot(); S.append(slide('', L, bg=BG))
     # 3 장비
-    L = [num('02'), wm(), put(H('세팅은 다 돼 있어요,<br><em>기타·베이스</em>만 챙겨요'), 250)]
-    L.append(box(80, 480, 920, 580, BLUE))
-    y = 522
+    L = [cap('02 · GEAR', 72), wm(), head('세팅은 다 돼 있어요,<br><em>기타·베이스</em>만 챙겨요'), deck('고정팀은 캐비넷에 악기를 두고 다닐 수 있어요 (6개월 이상).')]
+    L.append(card(80, 440, 920, 760, PRI))
+    y = 496
     for k, v in GEAR:
-        L.append(put(T(k, size=24, weight=700, color=YEL, x=120, w=190, lh=1.3), y + 4))
-        L.append(put(T(v, size=28, weight=500, color=WH, x=320, w=650, lh=1.35), y))
-        y += 66 + (38 if '<br>' in v else 0)
-    L.append(put(T('고정팀은 캐비넷에 악기를 두고 다닐 수 있어요 (6개월 이상)', size=26, weight=500, color=MUT), 1100))
-    S.append(slide('', L, bg=CREAM))
+        L.append(kcap(k, y + 6, x=128, w=180, color=YEL))
+        L.append(body(v, 320, y, 640, 28, color=WH, lh=1.35))
+        y += 88 + (38 if '<br>' in v else 0)
+    L += foot(); S.append(slide('', L, bg=BG))
     # 4 시간 문의
-    L = [num('03'), wm(), put(H('비는 시간은<br>그때그때 <em>달라요</em>'), 250)]
-    L.append(box(80, 480, 920, 400, YEL))
-    L.append(put(H('원하는 요일·시간을<br>알려주시면 바로 확인!', size=56, lh=1.2, x=130, w=820, color=ONYEL), 526))
-    L.append(put(T('요일·시간대별로 상황이 자주 바뀌어요', size=30, weight=500, color=ONYEL, x=130, w=820), 700))
-    L.append(put(T('문의는 DM으로 주세요 · @gatherallaround', size=30, weight=700, color=ONYEL, x=130, w=820), 752))
-    im = Img('@studio2.jpg', 80, 460, 307, radius=24); im['y'] = 940; L.append(im)  # 3:2 원본 비율
-    L.append(put(T('대관 예약은<br>프로필 링크에서', size=34, weight=700, color=INK, x=580, w=420, lh=1.3), 990))
-    L.append(put(T('@gatherallaround', size=26, weight=500, color=MUT, x=580, w=420), 1096))
-    S.append(slide('', L, bg=CREAM))
+    L = [cap('03 · TIME', 72), wm(), head('비는 시간은<br>그때그때 <em>달라요</em>'), deck('요일·시간대별로 상황이 자주 바뀌어요.<br>원하는 요일과 시간을 알려주시면 바로 확인해 드릴게요.')]
+    L.append(photo('studio2.jpg', 80, 440, 920, 613))
+    L += strip(1080, '문의는 DM으로 · @gatherallaround') + strip(1148, '대관 예약은 프로필 링크에서')
+    L += foot(); S.append(slide('', L, bg=BG))
     # 5 고정팀
-    L = [num('04'), wm(), put(H('매주 한 번,<br>우리 팀 <em>고정 시간</em>'), 250)]
-    for i, (x, fill, lab, price) in enumerate([(80, BLUE, '주 1회', '20만원'), (550, DARKC, '주 2회', '30만원')]):
-        L.append(box(x, 500, 450, 300, fill))
-        L.append(put(T(lab, size=28, weight=700, color=YEL, x=x + 40, w=370), 540))
-        L.append(put(H(price, size=96, color=WH, x=x + 40, w=390, lh=1.0), 596))
-        L.append(put(T('4주 · 5인 팀 기준', size=24, weight=500, color=WH, x=x + 40, w=370), 730))
-    L.append(tag('2타임이면 10만원 아껴요', 580, 456, w=440, rot=-5, size=28))
-    L.append(put(T('한 타임 = 주 1회 고정 시간, 4주 동안 보장', size=30, weight=500, color=INK), 850))
-    L.append(put(T('공휴일 상관없이 4주 · 인원 추가 시 1명당 +5만원', size=30, weight=500, color=INK), 900))
-    L.append(put(T('고정팀 혜택은 다음 장에서 →', size=26, weight=500, color=MUT), 1250))
-    S.append(slide('', L, bg=CREAM))
+    L = [cap('04 · MONTHLY', 72), wm(), head('매주 한 번,<br>우리 팀 <em>고정 시간</em>'), deck('4주 단위 · 5인 팀 기준 · 공휴일 상관없이 4주 보장')]
+    L += price_card(80, PRI, '주 1회', '20만원', '한 타임 = 주 1회 고정 시간') + price_card(550, DARKC, '주 2회', '30만원', '따로 쓰는 것보다 10만원 절약')
+    y = 848
+    for t in ['인원 추가 시 1명당 +5만원', '공휴일 상관없이 4주 동안 보장', '고정팀 혜택은 다음 장에서 →']:
+        L.append(body(t, 80, y, 920, 28, weight=600)); L.append(rule(y + 60)); y += 84
+    L += foot(); S.append(slide('', L, bg=BG))
     # 6 혜택
-    L = [num('05'), wm(), put(H('고정팀이 되면<br>이런 게 <em>따라와요</em>'), 250)]
-    y = 500
+    L = [cap('05 · BENEFITS', 72), wm(), head('고정팀이 되면<br>이런 게 <em>따라와요</em>'), deck('고정팀에게만 드리는 세 가지.')]
+    y = 440
     for i, t in enumerate(BENE, 1):
-        L.append(box(80, y, 64, 64, BLUE, radius=999))
-        L.append(put(H(str(i), size=34, color=WH, x=80, w=64, lh=1.0, align='center', pad=15), y))
-        L.append(put(T(t, size=34, weight=700, color=INK, x=170, w=830, lh=1.0, pad=14), y))
-        y += 88
-    im = Img('@studio10.png', 80, 680, 443, radius=24); im['y'] = 870; L.append(im)  # 1.53:1 원본 비율
-    S.append(slide('', L, bg=CREAM))
+        L.append(card(80, y, 56, 56, PRI, 999))
+        L.append(at(T(str(i), font='blackhan', size=28, weight=400, color=WH, align='center', x=80, w=56, lh=1.0, pad=14), y))
+        L.append(body(t, 160, y + 4, 840, 32, weight=700, lh=1.5))
+        L.append(rule(y + 74)); y += 92
+    L.append(photo('studio10.png', 195, 740, 690, 450))
+    L += foot(); S.append(slide('', L, bg=BG))
     # 7 대관 + 문의
-    L = [num('06'), wm(), put(H('하루만 써도 좋아요<br>평일 <em>2.5만</em> · 주말 <em>4만</em>'), 250)]
-    L.append(put(T('시간 단위 대관 · 5인 기준 · 최대 20명 · 인원 추가 1명당 +5,000원', size=26, weight=500, color=MUT), 470))
-    L.append(box(80, 540, 920, 500, BLUE))
-    L.append(put(T('예약 · 문의', size=24, weight=700, color=YEL, x=130, w=820, ls=0.08), 586))
-    L.append(put(H('예약은 프로필 링크', size=58, color=WH, x=130, w=820, lh=1.0), 630))
-    L.append(put(H('문의는 DM으로', size=58, color=YEL, x=130, w=820, lh=1.0), 706))
-    L.append(put(T('@gatherallaround', size=34, weight=700, color=WH, x=130, w=820), 806))
-    L.append(put(T('원하는 시간을 알려주시면 바로 확인해 드려요', size=28, weight=500, color='#FBE4D6', x=130, w=820), 866))
-    L.append(tag('하루만 써도 좋아요', 600, 1004, w=380, rot=6, size=30))
-    L.append(put(T(WM, font='display', size=30, color=INK, x=80, w=500), 1240))
-    S.append(slide('', L, bg=CREAM))
+    L = [cap('06 · RENTAL', 72), wm(), head('하루만 써도<br><em>좋아요</em>'), deck('시간 단위 대관 · 5인 기준 · 최대 20명 · 인원 추가 1명당 +5,000원')]
+    L += price_card(80, PRI, '평일', '2.5만원', '1시간 · 5인 기준', h=300) + price_card(550, DARKC, '주말', '4만원', '1시간 · 5인 기준', h=300)
+    L.append(card(80, 770, 920, 430, PRI))
+    L.append(kcap('예약 · 문의', 818, x=128, w=400, color=YEL))
+    L.append(head('예약은 프로필 링크', 856, size=52, color=WH, x=128, w=824))
+    L.append(head('문의는 DM으로', 922, size=52, color=YEL, x=128, w=824))
+    L.append(body('@gatherallaround', 128, 1010, 824, 30, color=WH, weight=700))
+    L.append(body('원하는 시간을 알려주시면 바로 확인해 드려요', 128, 1060, 824, 26, color=SOFT))
+    L += foot(); S.append(slide('', L, bg=BG))
     for s in S:
         for l in s['layers']: l.pop('_h', None)
     return S
