@@ -214,7 +214,6 @@ def flyer(dark=False):
         L.append(put(T(t, size=34, weight=700, color=INK, x=170, w=830, lh=1.0, pad=14), y))
         y += 88
     im = Img('@studio10.png', 80, 680, 443, radius=24); im['y'] = 870; L.append(im)  # 1.53:1 원본 비율
-    L.append(put(T('함께한 팀들의<br>연합공연 현장', size=26, weight=700, color=INK, x=790, w=210, lh=1.35), 1120))
     S.append(slide('', L, bg=CREAM))
     # 7 대관 + 문의
     L = [num('06'), wm(), put(H('하루만 써도 좋아요<br>평일 <em>2.5만</em> · 주말 <em>4만</em>'), 250)]
