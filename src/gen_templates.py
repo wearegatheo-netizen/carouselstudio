@@ -139,9 +139,9 @@ for k, v in out.items(): apply_copy(v['slides'])
 json.dump(out, open('templates.json', 'w'), ensure_ascii=False)
 print({k: len(v['slides']) for k, v in out.items()})
 
-# ───────── 라이브 플라이어 (밝은 종이 · 코발트 블루 · 노랑 형광 · 검은고딕) ─────────
+# ───────── 라이브 플라이어 (복숭아 크림 · 테라코타 · 머스터드 · 검은고딕) ─────────
 def flyer():
-    CREAM, INK, BLUE, YEL, MUT, WH = '#F3EEE4', '#151515', '#2B55D6', '#FFD23F', '#6F6A60', '#FFFFFF'
+    CREAM, INK, BLUE, YEL, MUT, WH = '#F7ECDD', '#2B1E17', '#D4603A', '#F5B942', '#8A6F5E', '#FFFFFF'  # 따뜻한 계열(2026-10-25): 복숭아 크림·에스프레소·테라코타·머스터드·웜 토프
     def H(html, size=92, color=INK, lh=1.05, **kw):  # 검은고딕 제목
         return T(html, font='blackhan', size=size, weight=400, color=color, lh=lh, accent=BLUE, **kw)
     def num(n): return H(n, size=150, color=BLUE, x=80, w=400, lh=1.0, y=72)
@@ -187,7 +187,7 @@ def flyer():
     L.append(put(H('원하는 요일·시간을<br>알려주시면 바로 확인!', size=56, lh=1.2, x=130, w=820), 530))
     L.append(put(T('요일·시간대별로 상황이 자주 바뀌어요', size=30, weight=500, color=INK, x=130, w=820), 700))
     L.append(put(T('문의는 DM으로 주세요 · @gatherallaround', size=30, weight=700, color=INK, x=130, w=820), 752))
-    L.append(put(T('대관 예약은 프로필 링크에서 할 수 있어요', size=24, weight=500, color='#5A5546', x=130, w=820), 820))
+    L.append(put(T('대관 예약은 프로필 링크에서 할 수 있어요', size=24, weight=500, color='#6B5240', x=130, w=820), 820))
     im = Img('@studio2.jpg', 80, 920, 270, radius=24); im['y'] = 970; L.append(im)
     S.append(slide('', L, bg=CREAM))
     # 5 고정팀
@@ -220,7 +220,7 @@ def flyer():
     L.append(put(H('예약은 프로필 링크', size=58, color=WH, x=130, w=820, lh=1.0), 630))
     L.append(put(H('문의는 DM으로', size=58, color=YEL, x=130, w=820, lh=1.0), 706))
     L.append(put(T('@gatherallaround', size=34, weight=700, color=WH, x=130, w=820), 806))
-    L.append(put(T('원하는 시간을 알려주시면 바로 확인해 드려요', size=28, weight=500, color='#DCE4FF', x=130, w=820), 866))
+    L.append(put(T('원하는 시간을 알려주시면 바로 확인해 드려요', size=28, weight=500, color='#FBE4D6', x=130, w=820), 866))
     L.append(tag('하루만 써도 좋아요', 600, 1004, w=380, rot=6, size=30))
     L.append(put(T(WM, font='display', size=30, color=INK, x=80, w=500), 1240))
     S.append(slide('', L, bg=CREAM))
@@ -228,7 +228,7 @@ def flyer():
         for l in s['layers']: l.pop('_h', None)
     return S
 
-out['flyer'] = {'name': '라이브 플라이어', 'desc': '밝은 종이 · 코발트 블루 색면 · 노란 형광 강조 · 검은고딕 제목', 'slides': apply_copy(flyer())}
+out['flyer'] = {'name': '라이브 플라이어', 'desc': '복숭아 크림 종이 · 테라코타 색면 · 머스터드 강조 · 검은고딕 제목', 'slides': apply_copy(flyer())}
 json.dump(out, open('templates.json', 'w'), ensure_ascii=False)
 print({k: len(v['slides']) for k, v in out.items()})
 
