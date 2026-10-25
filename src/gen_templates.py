@@ -161,17 +161,17 @@ def flyer(dark=False):
     # 1 표지
     L = [box(0, 0, 1080, 790, BLUE, radius=0)]
     L += [put(T(WM, font='display', size=28, color=WH, x=80, w=500), 40), put(T('합주실 · 소공연 · 모임 공간', size=24, weight=700, color=YEL, align='right', x=580, w=420, ls=0.06), 42)]
-    im = Img('@studio1.jpg', 80, 920, 600, radius=28); im['y'] = 100; im['border'] = WH; im['borderA'] = 100; im['borderW'] = 8; L.append(im)
-    L.append(tag('팀 모집 중!', 640, 650, w=320, rot=-8, size=36))
-    L.append(put(H('같이 쓸 팀<br><em>찾고 있어요</em>', size=120), 850))
+    im = Img('@studio1.jpg', 80, 920, 613, radius=28); im['y'] = 96; im['border'] = WH; im['borderA'] = 100; im['borderW'] = 8; L.append(im)  # 3:2 원본 비율
+    L.append(tag('팀 모집 중!', 640, 660, w=320, rot=-8, size=36))
+    L.append(put(H('우리 공간,<br><em>같이 쓸래요?</em>', size=120), 850))
     L.append(put(T('월 고정팀 모집 · 시간 단위 대관', size=34, weight=700, color=INK), 1130))
     L.append(put(T('@gatherallaround · 예약은 프로필 링크', size=24, weight=500, color=MUT), 1250))
     S.append(slide('', L, bg=CREAM))
     # 2 공간
-    L = [num('01'), wm(), put(H('합주도 공연도,<br>끝나면 <em>보드게임</em>'), 250)]
-    im = Img('@studio11.jpg', 80, 920, 380, radius=24); im['y'] = 480; L.append(im)
-    L += strip(900, '110인치 빔스크린 · 캠핑 테이블 2 · 의자 15') + strip(972, '싱크대 · 내부 화장실 · 다양한 보드게임')
-    L.append(put(T('다양한 팀들과 교류하고 연합공연도 함께 열어요', size=28, weight=500, color=MUT), 1070))
+    L = [num('01'), wm(), put(H('합주도 공연도,<br>끝나면 <em>보드게임</em>'), 236)]
+    im = Img('@studio11.jpg', 80, 920, 613, radius=24); im['y'] = 448; L.append(im)  # 3:2 원본 비율
+    L += strip(1082, '110인치 빔스크린 · 캠핑 테이블 2 · 의자 15') + strip(1154, '싱크대 · 내부 화장실 · 다양한 보드게임')
+    L.append(put(T('다양한 팀들과 교류하고 연합공연도 함께 열어요', size=24, weight=500, color=MUT), 1236))
     S.append(slide('', L, bg=CREAM))
     # 3 장비
     L = [num('02'), wm(), put(H('세팅은 다 돼 있어요,<br><em>기타·베이스</em>만 챙겨요'), 250)]
@@ -185,12 +185,13 @@ def flyer(dark=False):
     S.append(slide('', L, bg=CREAM))
     # 4 시간 문의
     L = [num('03'), wm(), put(H('비는 시간은<br>그때그때 <em>달라요</em>'), 250)]
-    L.append(box(80, 480, 920, 440, YEL))
-    L.append(put(H('원하는 요일·시간을<br>알려주시면 바로 확인!', size=56, lh=1.2, x=130, w=820, color=ONYEL), 530))
+    L.append(box(80, 480, 920, 400, YEL))
+    L.append(put(H('원하는 요일·시간을<br>알려주시면 바로 확인!', size=56, lh=1.2, x=130, w=820, color=ONYEL), 526))
     L.append(put(T('요일·시간대별로 상황이 자주 바뀌어요', size=30, weight=500, color=ONYEL, x=130, w=820), 700))
     L.append(put(T('문의는 DM으로 주세요 · @gatherallaround', size=30, weight=700, color=ONYEL, x=130, w=820), 752))
-    L.append(put(T('대관 예약은 프로필 링크에서 할 수 있어요', size=24, weight=500, color='#6B5240', x=130, w=820), 820))
-    im = Img('@studio2.jpg', 80, 920, 270, radius=24); im['y'] = 970; L.append(im)
+    im = Img('@studio2.jpg', 80, 460, 307, radius=24); im['y'] = 940; L.append(im)  # 3:2 원본 비율
+    L.append(put(T('대관 예약은<br>프로필 링크에서', size=34, weight=700, color=INK, x=580, w=420, lh=1.3), 990))
+    L.append(put(T('@gatherallaround', size=26, weight=500, color=MUT, x=580, w=420), 1096))
     S.append(slide('', L, bg=CREAM))
     # 5 고정팀
     L = [num('04'), wm(), put(H('매주 한 번,<br>우리 팀 <em>고정 시간</em>'), 250)]
@@ -211,8 +212,9 @@ def flyer(dark=False):
         L.append(box(80, y, 64, 64, BLUE, radius=999))
         L.append(put(H(str(i), size=34, color=WH, x=80, w=64, lh=1.0, align='center', pad=15), y))
         L.append(put(T(t, size=34, weight=700, color=INK, x=170, w=830, lh=1.0, pad=14), y))
-        y += 104
-    im = Img('@studio10.png', 80, 920, 300, radius=24); im['y'] = 940; L.append(im)
+        y += 88
+    im = Img('@studio10.png', 80, 680, 443, radius=24); im['y'] = 870; L.append(im)  # 1.53:1 원본 비율
+    L.append(put(T('함께한 팀들의<br>연합공연 현장', size=26, weight=700, color=INK, x=790, w=210, lh=1.35), 1120))
     S.append(slide('', L, bg=CREAM))
     # 7 대관 + 문의
     L = [num('06'), wm(), put(H('하루만 써도 좋아요<br>평일 <em>2.5만</em> · 주말 <em>4만</em>'), 250)]
